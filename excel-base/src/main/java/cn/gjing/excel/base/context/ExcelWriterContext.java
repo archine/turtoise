@@ -1,13 +1,10 @@
-package cn.gjing.excel.executor.write.context;
+package cn.gjing.excel.base.context;
 
 import cn.gjing.excel.base.ExcelFieldProperty;
-import cn.gjing.excel.base.context.AbstractExcelContext;
 import cn.gjing.excel.base.meta.ExcelType;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,26 +24,6 @@ public final class ExcelWriterContext extends AbstractExcelContext {
      * Excel file name
      */
     private String fileName;
-
-    /**
-     * Whether to open multistage Excel headers
-     */
-    private boolean multiHead = false;
-
-    /**
-     * Whether a header exists
-     */
-    private boolean existHead = true;
-
-    /**
-     * Whether is excel template file
-     */
-    private boolean isTemplate = false;
-
-    /**
-     * Excel header fields
-     */
-    private List<Field> excelFields = new ArrayList<>();
 
     /**
      * Whether you need to add a file identifier when exporting an Excel file,
@@ -80,7 +57,12 @@ public final class ExcelWriterContext extends AbstractExcelContext {
     private int headerSeries = 1;
 
     /**
-     * Excel filed property
+     * Whether the current export is a template
+     */
+    private boolean isTemplate;
+
+    /**
+     * Excel filed properties
      */
     private List<ExcelFieldProperty> fieldProperties;
 

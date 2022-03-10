@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
  **/
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface ExcelClass {
+public @interface Excel {
     /**
      * Name of the Excel file generated when exporting.
      * If this is not set, the current time is used as the name

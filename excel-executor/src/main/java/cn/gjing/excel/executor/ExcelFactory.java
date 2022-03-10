@@ -1,17 +1,17 @@
 package cn.gjing.excel.executor;
 
-import cn.gjing.excel.base.ExcelFieldProperty;
-import cn.gjing.excel.base.annotation.ExcelClass;
+import cn.gjing.excel.base.annotation.Excel;
+import cn.gjing.excel.base.context.ExcelReaderContext;
+import cn.gjing.excel.base.context.ExcelWriterContext;
 import cn.gjing.excel.base.exception.ExcelException;
 import cn.gjing.excel.base.exception.ExcelTemplateException;
 import cn.gjing.excel.base.meta.ExcelType;
 import cn.gjing.excel.executor.read.ExcelBindReader;
+import cn.gjing.excel.executor.read.ExcelSimpleReader;
 import cn.gjing.excel.executor.util.BeanUtils;
 import cn.gjing.excel.executor.util.ExcelUtils;
-import cn.gjing.excel.executor.util.ParamUtils;
 import cn.gjing.excel.executor.write.ExcelBindWriter;
 import cn.gjing.excel.executor.write.ExcelSimpleWriter;
-import cn.gjing.excel.executor.write.context.ExcelWriterContext;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -63,36 +61,33 @@ public final class ExcelFactory {
      */
     public static ExcelBindWriter createWriter(String fileName, Class<?> excelEntity, HttpServletResponse response, String... ignores) {
         Objects.requireNonNull(excelEntity, "Excel mapping class cannot be null");
-        ExcelClass excel = excelEntity.getAnnotation(ExcelClass.class);
+        Excel excel = excelEntity.getAnnotation(Excel.class);
         Objects.requireNonNull(excel, "@Excel annotation was not found on the " + excelEntity);
-        List<ExcelFieldProperty> properties = new ArrayList<>();
         ExcelWriterContext context = new ExcelWriterContext();
-        context.setExcelFields(BeanUtils.getExcelFields(excelEntity, ignores, properties));
-        context.setExcelClass(excelEntity);
-        context.setFieldProperties(properties);
+        context.setExcelEntity(excelEntity);
+        context.setFieldProperties(BeanUtils.getExcelFiledProperties(excelEntity, ignores));
         context.setExcelType(excel.type());
         context.setFileName(StringUtils.hasText(fileName) ? fileName : "".equals(excel.value()) ? LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : excel.value());
         context.setHeaderHeight(excel.headerHeight());
-        context.setHeaderSeries(properties.get(0).getValue().length);
+        context.setHeaderSeries(context.getFieldProperties().get(0).getValue().length);
         context.setBodyHeight(excel.bodyHeight());
         context.setUniqueKey("".equals(excel.uniqueKey()) ? excelEntity.getName() : excel.uniqueKey());
         return new ExcelBindWriter(context, excel, response);
     }
 
     /**
-     * Create an Excel writer
+     * Create an Excel simple writer
      *
      * @param fileName         Excel file name
      * @param response         response
-     * @param initDefaultStyle Use the default style listener
      * @return ExcelSimpleWriter
      */
-    public static ExcelSimpleWriter createSimpleWriter(String fileName, HttpServletResponse response, boolean initDefaultStyle) {
-        return createSimpleWriter(fileName, response, ExcelType.XLS, 500, initDefaultStyle);
+    public static ExcelSimpleWriter createSimpleWriter(String fileName, HttpServletResponse response) {
+        return createSimpleWriter(fileName, response, ExcelType.XLS, 500);
     }
 
     /**
-     * Create an Excel writer
+     * Create an Excel simple writer
      *
      * @param fileName  Excel file name
      * @param response  response
@@ -100,26 +95,11 @@ public final class ExcelFactory {
      * @return ExcelSimpleWriter
      */
     public static ExcelSimpleWriter createSimpleWriter(String fileName, HttpServletResponse response, ExcelType excelType) {
-        return createSimpleWriter(fileName, response, excelType, 500, true);
+        return createSimpleWriter(fileName, response, excelType, 500);
     }
 
     /**
-     * Create an Excel writer
-     *
-     * @param fileName   Excel file name
-     * @param response   response
-     * @param excelType  Excel file type
-     * @param windowSize Window size, which is flushed to disk when exported
-     *                   if the data that has been written out exceeds the specified size
-     *                   only for xlsx
-     * @return ExcelSimpleWriter
-     */
-    public static ExcelSimpleWriter createSimpleWriter(String fileName, HttpServletResponse response, ExcelType excelType, int windowSize) {
-        return createSimpleWriter(fileName, response, excelType, windowSize, true);
-    }
-
-    /**
-     * Create an Excel writer
+     * Create an Excel simple writer
      *
      * @param fileName         Excel file name
      * @param response         response
@@ -127,20 +107,19 @@ public final class ExcelFactory {
      * @param windowSize       Window size, which is flushed to disk when exported
      *                         if the data that has been written out exceeds the specified size
      *                         only for xlsx
-     * @param initDefaultStyle Whether init  default excel style
      * @return ExcelSimpleWriter
      */
-    public static ExcelSimpleWriter createSimpleWriter(String fileName, HttpServletResponse response, ExcelType excelType, int windowSize, boolean initDefaultStyle) {
+    public static ExcelSimpleWriter createSimpleWriter(String fileName, HttpServletResponse response, ExcelType excelType, int windowSize) {
         ExcelWriterContext context = new ExcelWriterContext();
         context.setFileName(StringUtils.hasText(fileName) ? fileName : LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         context.setExcelType(excelType);
-        context.setExcelClass(Object.class);
+        context.setExcelEntity(Object.class);
         context.setBind(false);
-        return new ExcelSimpleWriter(context, windowSize, response, initDefaultStyle);
+        return new ExcelSimpleWriter(context, windowSize, response);
     }
 
     /**
-     * Create an Excel reader
+     * Create an Excel bind reader
      *
      * @param file       Excel file
      * @param excelClass Excel mapped entity
@@ -162,7 +141,7 @@ public final class ExcelFactory {
     }
 
     /**
-     * Create an Excel reader
+     * Create an Excel bind reader
      *
      * @param file       Excel file
      * @param excelClass Excel mapped entity
@@ -184,26 +163,26 @@ public final class ExcelFactory {
     }
 
     /**
-     * Create an Excel reader
+     * Create an Excel bind reader
      *
      * @param inputStream Excel file inputStream
-     * @param excelClass  Excel mapped entity
+     * @param excelEntity  Excel entity
      * @param ignores     Ignore the array of actual Excel table headers that you read when importing
      * @param excelType   Excel file type
      * @param <R>         Entity type
      * @return ExcelReader
      */
-    public static <R> ExcelBindReader<R> createReader(InputStream inputStream, Class<R> excelClass, ExcelType excelType, String... ignores) {
-        Objects.requireNonNull(excelClass, "Excel mapping class cannot be null");
-        Excel excel = excelClass.getAnnotation(Excel.class);
-        ParamUtils.requireNonNull(excel, "@Excel annotation was not found on the " + excelClass);
-        ExcelReaderContext<R> readerContext = new ExcelReaderContext<>(excelClass, BeanUtils.getExcelFieldsMap(excelClass), ignores);
-        readerContext.setUniqueKey("".equals(excel.uniqueKey()) ? excelClass.getName() : excel.uniqueKey());
-        return new ExcelBindReader<>(readerContext, inputStream, excelType, excel.cacheRowSize(), excel.bufferSize());
+    public static <R> ExcelBindReader<R> createReader(InputStream inputStream, Class<R> excelEntity, ExcelType excelType, String... ignores) {
+        Objects.requireNonNull(excelEntity, "Excel mapping class cannot be null");
+        Excel excel = excelEntity.getAnnotation(Excel.class);
+        Objects.requireNonNull(excel, "@Excel annotation was not found on the " + excel);
+        ExcelReaderContext<R> readerContext = new ExcelReaderContext<>(excelEntity, BeanUtils.getExcelFieldsMap(excelEntity), ignores);
+        readerContext.setUniqueKey("".equals(excel.uniqueKey()) ? excelEntity.getName() : excel.uniqueKey());
+        return new ExcelBindReader<>(readerContext, inputStream, excelType, excel.cacheRow(), excel.bufferSize());
     }
 
     /**
-     * Create an Excel reader
+     * Create an Excel simple reader
      *
      * @param file       Excel file
      * @param ignores    Ignore the array of actual Excel table headers that you read when importing
@@ -220,12 +199,12 @@ public final class ExcelFactory {
             }
             return createSimpleReader(new FileInputStream(file), excelType, cacheRow, bufferSize, ignores);
         } catch (IOException e) {
-            throw new ExcelInitException("Create excel reader error," + e.getMessage());
+            throw new ExcelException("Create excel reader error," + e.getMessage());
         }
     }
 
     /**
-     * Create an Excel reader
+     * Create an Excel simple reader
      *
      * @param file    Excel file
      * @param ignores Ignore the array of actual Excel table headers that you read when importing
@@ -245,7 +224,7 @@ public final class ExcelFactory {
     }
 
     /**
-     * Create an Excel reader
+     * Create an Excel simple reader
      *
      * @param file       Excel file
      * @param ignores    Ignore the array of actual Excel table headers that you read when importing
@@ -267,7 +246,7 @@ public final class ExcelFactory {
     }
 
     /**
-     * Create an Excel reader
+     * Create an Excel simple reader
      *
      * @param file    Excel file
      * @param ignores Ignore the array of actual Excel table headers that you read when importing
@@ -287,7 +266,7 @@ public final class ExcelFactory {
     }
 
     /**
-     * Create an Excel reader
+     * Create an Excel simple reader
      *
      * @param inputStream Excel file inputStream
      * @param ignores     Ignore the array of actual Excel table headers that you read when importing

@@ -1,8 +1,13 @@
 package cn.gjing.excel.executor.write;
 
+import cn.gjing.excel.base.aware.ExcelWorkbookAware;
+import cn.gjing.excel.base.context.ExcelWriterContext;
+import cn.gjing.excel.base.listener.write.ExcelWriteListener;
 import cn.gjing.excel.base.meta.ExecMode;
+import cn.gjing.excel.base.meta.InitializerMeta;
+import cn.gjing.excel.executor.util.ListenerChain;
 import cn.gjing.excel.executor.util.ParamUtils;
-import cn.gjing.excel.executor.write.context.ExcelWriterContext;
+import cn.gjing.excel.executor.write.aware.ExcelWriteContextAware;
 import cn.gjing.excel.executor.write.core.ExcelWriteXlsResolver;
 import cn.gjing.excel.executor.write.core.ExcelWriteXlsxResolver;
 import cn.gjing.excel.executor.write.core.ExcelWriterResolver;
@@ -13,9 +18,6 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.UUID;
-
-import static cn.gjing.excel.base.meta.ExcelType.XLS;
-import static cn.gjing.excel.base.meta.ExcelType.XLSX;
 
 /**
  * Excel base writer
@@ -32,7 +34,7 @@ public abstract class ExcelBaseWriter {
         this.response = response;
         this.context = context;
         this.chooseResolver(context, windowSize, mode);
-        this.initStyle();
+        InitializerMeta.INSTANT.init(context.getListenerCache());
     }
 
     /**
@@ -47,11 +49,11 @@ public abstract class ExcelBaseWriter {
         switch (this.context.getExcelType()) {
             case XLS:
                 context.setWorkbook(new HSSFWorkbook());
-                this.writerResolver = new ExcelWriteXlsResolver(context, execType);
+                this.writerResolver = new ExcelWriteXlsResolver(context, mode);
                 break;
             case XLSX:
                 context.setWorkbook(new SXSSFWorkbook(windowSize));
-                this.writerResolver = new ExcelWriteXlsxResolver(context, execType);
+                this.writerResolver = new ExcelWriteXlsxResolver(context, mode);
                 break;
             default:
         }
@@ -101,6 +103,15 @@ public abstract class ExcelBaseWriter {
         ListenerChain.doCompleteSheet(this.context.getListenerCache(), sheet);
     }
 
+    protected void initAware(ExcelWriteListener excelWriteListener) {
+        if (excelWriteListener instanceof ExcelWriteContextAware) {
+            ((ExcelWriteContextAware) excelWriteListener).setContext(this.context);
+        }
+        if (excelWriteListener instanceof ExcelWorkbookAware) {
+            ((ExcelWorkbookAware) excelWriteListener).setWorkbook(this.context.getWorkbook());
+        }
+    }
+
     private void processBind() {
         if (!this.context.isBind()) {
             return;
@@ -111,9 +122,5 @@ public abstract class ExcelBaseWriter {
         Row row = sheet.createRow(0);
         row.createCell(0).setCellValue(ParamUtils.encodeMd5(this.context.getUniqueKey()));
         this.context.getWorkbook().setSheetHidden(this.context.getWorkbook().getSheetIndex(sheet), true);
-    }
-
-    private void initStyle() {
-
     }
 }

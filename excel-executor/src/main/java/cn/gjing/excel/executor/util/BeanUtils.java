@@ -46,41 +46,36 @@ public final class BeanUtils {
     }
 
     /**
-     * Get all excel fields of the parent and child classes
+     * Get all excel field properties of the parent and child classes
      *
-     * @param excelClass      Excel mapped entity
-     * @param ignores         The exported field is to be ignored
-     * @param fieldProperties Excel field property
-     * @return Excel fields
+     * @param excelClass Excel mapped entity
+     * @param ignores    The exported field is to be ignored
      */
-    public static List<Field> getExcelFields(Class<?> excelClass, String[] ignores, List<ExcelFieldProperty> fieldProperties) {
-        List<Field> fieldList = getAllFields(excelClass);
-        fieldList = fieldList.stream()
+    public static List<ExcelFieldProperty> getExcelFiledProperties(Class<?> excelClass, String[] ignores) {
+        List<ExcelFieldProperty> fieldProperties = new ArrayList<>();
+        getAllFields(excelClass).stream()
                 .filter(e -> e.isAnnotationPresent(ExcelField.class))
                 .sorted(Comparator.comparing(e -> e.getAnnotation(ExcelField.class).order()))
-                .filter(e -> {
+                .forEach(e -> {
                     ExcelField excelField = e.getAnnotation(ExcelField.class);
                     String[] headNameArray = excelField.value();
                     for (String name : headNameArray) {
                         if (ParamUtils.contains(ignores, name)) {
-                            return false;
+                            return;
                         }
                     }
-                    if (fieldProperties != null) {
-                        fieldProperties.add(ExcelFieldProperty.builder()
-                                .value(excelField.value())
-                                .title(excelField.title())
-                                .width(excelField.width())
-                                .order(excelField.order())
-                                .format(excelField.format())
-                                .color(excelField.color())
-                                .fontColor(excelField.fontColor())
-                                .build());
-                    }
-                    return true;
-                })
-                .collect(Collectors.toList());
-        return fieldList;
+                   fieldProperties.add(ExcelFieldProperty.builder()
+                            .value(excelField.value())
+                            .field(e)
+                            .title(excelField.title())
+                            .width(excelField.width())
+                            .order(excelField.order())
+                            .format(excelField.format())
+                            .color(excelField.color())
+                            .fontColor(excelField.fontColor())
+                            .build());
+                });
+        return fieldProperties;
     }
 
     /**

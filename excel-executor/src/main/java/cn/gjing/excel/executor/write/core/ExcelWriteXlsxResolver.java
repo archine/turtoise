@@ -1,10 +1,9 @@
 package cn.gjing.excel.executor.write.core;
 
+import cn.gjing.excel.base.context.ExcelWriterContext;
 import cn.gjing.excel.base.meta.ExecMode;
-import cn.gjing.excel.executor.write.context.ExcelWriterContext;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Xlsx resolver
@@ -18,8 +17,8 @@ public class ExcelWriteXlsxResolver extends ExcelWriterResolver {
     }
 
     @Override
-    public ExcelWriterResolver writeHead(boolean needHead, Map<String, String[]> boxValues) {
-        super.writeExecutor.writeHead(needHead, boxValues);
+    public ExcelWriterResolver writeHead(boolean needHead) {
+        super.writeExecutor.writeHead(needHead);
         return this;
     }
 

@@ -1,6 +1,5 @@
 package cn.gjing.excel.base.context;
 
-import cn.gjing.excel.base.annotation.ExcelSharedListener;
 import cn.gjing.excel.base.listener.ExcelListener;
 import lombok.Getter;
 import lombok.Setter;
@@ -49,12 +48,5 @@ public abstract class AbstractExcelContext {
         if (listener != null) {
             this.listenerCache.add(listener);
         }
-    }
-
-    /**
-     * Clear the current listener cache
-     */
-    public void clearListener() {
-        listenerCache.removeIf(next -> !next.getClass().isAnnotationPresent(ExcelSharedListener.class));
     }
 }

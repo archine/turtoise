@@ -8,9 +8,9 @@
         <version>2022.1.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>excel-executor</artifactId>
+    <artifactId>excel-style</artifactId>
     <version>2022.1.0</version>
-    <description>Excel执行器</description>
+    <description>Excel样式</description>
 
     <properties>
         <java.version>1.8</java.version>
@@ -23,29 +23,7 @@
             <groupId>cn.gjing.excel</groupId>
             <artifactId>excel-base</artifactId>
             <version>2022.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
             <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>5.3.14</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>5.3.16</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.8.9</version>
         </dependency>
     </dependencies>
 

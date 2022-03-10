@@ -1,6 +1,5 @@
-package cn.gjing.excel.executor.write.aware;
+package cn.gjing.excel.base.aware;
 
-import cn.gjing.excel.base.aware.ExcelAware;
 import cn.gjing.excel.base.context.ExcelWriterContext;
 
 /**

@@ -1,9 +1,8 @@
 package cn.gjing.excel.executor.write.core;
 
-import cn.gjing.excel.executor.write.context.ExcelWriterContext;
+import cn.gjing.excel.base.context.ExcelWriterContext;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Excel writes the core processor
@@ -18,15 +17,14 @@ public abstract class ExcelBaseWriteExecutor {
     }
 
     /**
-     * Set excel head
+     * Write excel head
      *
      * @param needHead  Whether to set header
-     * @param boxValues Excel dropdown box value
      */
-    public abstract void writeHead(boolean needHead, Map<String, String[]> boxValues);
+    public abstract void writeHead(boolean needHead);
 
     /**
-     * Set excel body
+     * Write excel body
      *
      * @param data Export data
      */

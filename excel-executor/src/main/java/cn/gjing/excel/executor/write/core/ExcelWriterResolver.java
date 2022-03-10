@@ -1,11 +1,12 @@
 package cn.gjing.excel.executor.write.core;
 
 import cn.gjing.excel.base.BigTitle;
+import cn.gjing.excel.base.context.ExcelWriterContext;
 import cn.gjing.excel.base.exception.ExcelException;
 import cn.gjing.excel.base.meta.ExcelType;
 import cn.gjing.excel.base.meta.ExecMode;
 import cn.gjing.excel.executor.util.ExcelUtils;
-import cn.gjing.excel.executor.write.context.ExcelWriterContext;
+import cn.gjing.excel.executor.util.ListenerChain;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -20,7 +21,6 @@ import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -48,7 +48,7 @@ public abstract class ExcelWriterResolver {
      */
     public void writeTitle(BigTitle bigTitle) {
         if (bigTitle.getLastCol() < 1) {
-            bigTitle.setLastCol(this.context.getExcelFields().size() - 1);
+            bigTitle.setLastCol(this.context.getFieldProperties().size() - 1);
         }
         if (bigTitle.getRowNum() < 1) {
             bigTitle.setRowNum(1);
@@ -88,10 +88,9 @@ public abstract class ExcelWriterResolver {
      * Write excel header
      *
      * @param needHead  Is needHead excel entity or sheet?
-     * @param boxValues Excel dropdown box values
      * @return this
      */
-    public abstract ExcelWriterResolver writeHead(boolean needHead, Map<String, String[]> boxValues);
+    public abstract ExcelWriterResolver writeHead(boolean needHead);
 
     /**
      * Output the contents of the cache

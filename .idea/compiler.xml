@@ -7,9 +7,14 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="excel-base" />
+        <module name="excel-style" />
         <module name="excel-executor" />
+        <module name="excel-base" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="excel-spring" target="8" />
+      <module name="excel-spring (2)" target="1.5" />
+    </bytecodeTargetLevel>
   </component>
 </project>

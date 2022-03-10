@@ -17,6 +17,7 @@
     <modules>
         <module>excel-base</module>
         <module>excel-executor</module>
+        <module>excel-style</module>
     </modules>
 
     <dependencies>

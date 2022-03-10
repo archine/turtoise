@@ -2,11 +2,10 @@ package cn.gjing.excel.executor.write;
 
 import cn.gjing.excel.base.BigTitle;
 import cn.gjing.excel.base.ExcelFieldProperty;
-import cn.gjing.excel.base.aware.ExcelWorkbookAware;
+import cn.gjing.excel.base.context.ExcelWriterContext;
 import cn.gjing.excel.base.listener.write.ExcelWriteListener;
 import cn.gjing.excel.base.meta.ExecMode;
-import cn.gjing.excel.executor.write.aware.ExcelWriteContextAware;
-import cn.gjing.excel.executor.write.context.ExcelWriterContext;
+import cn.gjing.excel.executor.read.ExcelBindReader;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletResponse;
@@ -20,7 +19,7 @@ import java.util.List;
  **/
 public final class ExcelSimpleWriter extends ExcelBaseWriter {
 
-    public ExcelSimpleWriter(ExcelWriterContext context, int windowSize, HttpServletResponse response, boolean initDefaultStyle) {
+    public ExcelSimpleWriter(ExcelWriterContext context, int windowSize, HttpServletResponse response) {
         super(context, windowSize, response, ExecMode.SIMPLE);
     }
 
@@ -34,14 +33,14 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      */
     public ExcelSimpleWriter head(List<String[]> headNames) {
         if (headNames != null && !headNames.isEmpty()) {
-            this.context.setHeaderSeries(headNames.get(0).length);
+            super.context.setHeaderSeries(headNames.get(0).length);
             List<ExcelFieldProperty> properties = new ArrayList<>();
             for (String[] headName : headNames) {
                 properties.add(ExcelFieldProperty.builder()
                         .value(headName)
                         .build());
             }
-            this.context.setFieldProperties(properties);
+            super.context.setFieldProperties(properties);
         }
         return this;
     }
@@ -54,8 +53,8 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      */
     public ExcelSimpleWriter head2(List<ExcelFieldProperty> properties) {
         if (properties != null && !properties.isEmpty()) {
-            this.context.setFieldProperties(properties);
-            this.context.setHeaderSeries(properties.get(0).getValue().length);
+            super.context.setFieldProperties(properties);
+            super.context.setHeaderSeries(properties.get(0).getValue().length);
         }
         return this;
     }
@@ -67,7 +66,7 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      * @return this
      */
     public ExcelSimpleWriter headHeight(short rowHeight) {
-        this.context.setHeaderHeight(rowHeight);
+        super.context.setHeaderHeight(rowHeight);
         return this;
     }
 
@@ -78,22 +77,22 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      * @return this
      */
     public ExcelSimpleWriter bodyHeight(short rowHeight) {
-        this.context.setBodyHeight(rowHeight);
+        super.context.setBodyHeight(rowHeight);
         return this;
     }
 
     /**
-     * Write an Excel header that does not trigger a row callback or cell callback
+     * To write big title
      *
      * @param bigTitle Big title
      * @return this
      */
     public ExcelSimpleWriter writeTitle(BigTitle bigTitle) {
-        return this.writeTitle(bigTitle, this.defaultSheetName);
+        return this.writeTitle(bigTitle, super.defaultSheetName);
     }
 
     /**
-     * Write an Excel header that does not trigger a row listener or cell listener
+     * To write big title
      *
      * @param bigTitle  Big title
      * @param sheetName Sheet name
@@ -101,11 +100,11 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      */
     public ExcelSimpleWriter writeTitle(BigTitle bigTitle, String sheetName) {
         if (bigTitle != null) {
-            this.createSheet(sheetName);
+            super.createSheet(sheetName);
             if (bigTitle.getLastCol() < 1) {
-                bigTitle.setLastCol(this.context.getFieldProperties().size() - 1);
+                bigTitle.setLastCol(super.context.getFieldProperties().size() - 1);
             }
-            this.writerResolver.writeTitle(bigTitle);
+            super.writerResolver.writeTitle(bigTitle);
         }
         return this;
     }
@@ -117,7 +116,7 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      * @return this
      */
     public ExcelSimpleWriter write(List<List<Object>> data) {
-        return this.write(data, this.defaultSheetName, true);
+        return this.write(data, super.defaultSheetName, true);
     }
 
     /**
@@ -135,11 +134,11 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      * To write
      *
      * @param data     data
-     * @param needHead Whether need excel head
+     * @param needHead need to write the header
      * @return this
      */
     public ExcelSimpleWriter write(List<List<Object>> data, boolean needHead) {
-        return this.write(data, this.defaultSheetName, needHead);
+        return this.write(data, super.defaultSheetName, needHead);
     }
 
     /**
@@ -147,16 +146,16 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      *
      * @param data      data
      * @param sheetName sheet name
-     * @param needHead  Whether need excel head
+     * @param needHead  need to write the header
      * @return this
      */
     public ExcelSimpleWriter write(List<List<Object>> data, String sheetName, boolean needHead) {
-        this.createSheet(sheetName);
+        super.createSheet(sheetName);
         if (data == null) {
-            this.context.setTemplate(true);
-            this.writerResolver.writeHead(needHead, null);
+            super.context.setTemplate(true);
+            super.writerResolver.writeHead(needHead);
         } else {
-            this.writerResolver.writeHead(needHead, null)
+            super.writerResolver.writeHead(needHead)
                     .write(data);
         }
         return this;
@@ -169,13 +168,8 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      * @return this
      */
     public ExcelSimpleWriter addListener(ExcelWriteListener listener) {
-        this.context.addListener(listener);
-        if (listener instanceof ExcelWriteContextAware) {
-            ((ExcelWriteContextAware) listener).setContext(this.context);
-        }
-        if (listener instanceof ExcelWorkbookAware) {
-            ((ExcelWorkbookAware) listener).setWorkbook(this.context.getWorkbook());
-        }
+        super.context.addListener(listener);
+        super.initAware(listener);
         return this;
     }
 
@@ -202,8 +196,8 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      */
     public ExcelSimpleWriter bind(String key) {
         if (StringUtils.hasLength(key)) {
-            this.context.setUniqueKey(key);
-            this.context.setBind(true);
+            super.context.setUniqueKey(key);
+            super.context.setBind(true);
         }
         return this;
     }
@@ -214,7 +208,7 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      * @return this
      */
     public ExcelSimpleWriter unbind() {
-        this.context.setBind(false);
+        super.context.setBind(false);
         return this;
     }
 }

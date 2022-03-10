@@ -1,27 +1,26 @@
 package cn.gjing.excel.executor.read;
 
 import cn.gjing.excel.base.context.ExcelReaderContext;
-import cn.gjing.excel.base.exception.ExcelTemplateException;
 import cn.gjing.excel.base.listener.read.ExcelReadListener;
-import cn.gjing.excel.base.listener.read.ExcelResultReadListener;
+import cn.gjing.excel.base.listener.read.ExcelRowReadListener;
 import cn.gjing.excel.base.meta.ExcelType;
 import cn.gjing.excel.base.meta.ExecMode;
 import cn.gjing.excel.executor.read.core.ExcelBaseReader;
-import org.springframework.util.StringUtils;
 
 import java.io.InputStream;
 import java.util.List;
 
 /**
- * Excel bind mode reader
- * The reader needs a mapping entity to correspond to it,
- * Automatically convert the data for each row to the corresponding Java entity
+ * Excel simple mode reader
+ * No mapping entities need to be provided.
+ * Instead of automatically turning each row into a Java entity,
+ * you can manually assemble your own objects in {@link ExcelRowReadListener}
  *
  * @author Gjing
  **/
-public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
-    public ExcelBindReader(ExcelReaderContext<R> context, InputStream inputStream, ExcelType excelType, int cacheRowSize, int bufferSize) {
-        super(context, inputStream, excelType, cacheRowSize, bufferSize, ExecMode.BIND);
+public class ExcelSimpleReader<R> extends ExcelBaseReader<R> {
+    public ExcelSimpleReader(ExcelReaderContext<R> context, InputStream inputStream, ExcelType excelType, int cacheRowSize, int bufferSize) {
+        super(context, inputStream, excelType, cacheRowSize, bufferSize, ExecMode.SIMPLE);
     }
 
     /**
@@ -30,7 +29,7 @@ public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
      *
      * @return this
      */
-    public ExcelBindReader<R> read() {
+    public ExcelSimpleReader<R> read() {
         super.baseReadExecutor.read(0, this.defaultSheetName);
         return this;
     }
@@ -42,7 +41,7 @@ public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
      * @param sheetName sheet name
      * @return this
      */
-    public ExcelBindReader<R> read(String sheetName) {
+    public ExcelSimpleReader<R> read(String sheetName) {
         super.baseReadExecutor.read(0, sheetName);
         return this;
     }
@@ -55,7 +54,7 @@ public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
      *                    set the subscript of the bottom level of the table header. The index starts at 0
      * @return this
      */
-    public ExcelBindReader<R> read(int headerIndex) {
+    public ExcelSimpleReader<R> read(int headerIndex) {
         super.baseReadExecutor.read(headerIndex, this.defaultSheetName);
         return this;
     }
@@ -68,7 +67,7 @@ public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
      * @param sheetName   Excel Sheet name
      * @return this
      */
-    public ExcelBindReader<R> read(int headerIndex, String sheetName) {
+    public ExcelSimpleReader<R> read(int headerIndex, String sheetName) {
         super.baseReadExecutor.read(headerIndex, sheetName);
         return this;
     }
@@ -79,44 +78,18 @@ public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
      * @param need Need
      * @return this
      */
-    public ExcelBindReader<R> headBefore(boolean need) {
+    public ExcelSimpleReader<R> headBefore(boolean need) {
         super.context.setHeadBefore(need);
         return this;
     }
 
     /**
-     * Check whether the imported Excel file matches the Excel mapping entity class.
-     * Thrown {@link ExcelTemplateException} if there is don't match.
-     *
-     * @return this
-     **/
-    public ExcelBindReader<R> check() {
-        super.context.setCheckTemplate(true);
-        return this;
-    }
-
-    /**
-     * Check whether the imported Excel file matches the Excel mapping entity class.
-     * Thrown {@link ExcelTemplateException} if is don't match.
-     *
-     * @param key Unique key
-     * @return this
-     **/
-    public ExcelBindReader<R> check(String key) {
-        super.context.setCheckTemplate(true);
-        if (StringUtils.hasLength(key)) {
-            this.context.setUniqueKey(key);
-        }
-        return this;
-    }
-
-    /**
-     * Add readListeners
+     * Add excel read listener
      *
      * @param readListenerList Read listeners
      * @return this
      */
-    public ExcelBindReader<R> addListener(List<? extends ExcelReadListener> readListenerList) {
+    public ExcelSimpleReader<R> addListener(List<? extends ExcelReadListener> readListenerList) {
         if (readListenerList != null) {
             readListenerList.forEach(this::addListener);
         }
@@ -124,25 +97,14 @@ public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
     }
 
     /**
-     * Add readListeners
+     * Add excel read listener
      *
      * @param readListener Read listener
      * @return this
      */
-    public ExcelBindReader<R> addListener(ExcelReadListener readListener) {
+    public ExcelSimpleReader<R> addListener(ExcelReadListener readListener) {
         super.context.addListener(readListener);
         super.initAware(readListener);
-        return this;
-    }
-
-    /**
-     * Subscribe to the data after the import is complete
-     *
-     * @param excelResultReadListener resultReadListener
-     * @return this
-     */
-    public ExcelBindReader<R> subscribe(ExcelResultReadListener<R> excelResultReadListener) {
-        super.context.setResultReadListener(excelResultReadListener);
         return this;
     }
 }
