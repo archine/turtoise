@@ -35,11 +35,13 @@ public enum InitializerMeta {
      * The listener in the initializer is added to the context listener cache.
      * called before each import or export
      *
-     * @param excelListeners context listener cache
+     * @param excelEntity    Current Excel entity
+     * @param execMode       Current execution mode
+     * @param excelListeners excel listeners
      */
-    public void init(List<ExcelListener> excelListeners) {
+    public void init(Class<?> excelEntity, ExecMode execMode,List<ExcelListener> excelListeners) {
         for (ExcelListenerInitializer initializer : initializers) {
-            initializer.initListeners(excelListeners);
+            initializer.initListeners(excelEntity,execMode, excelListeners);
         }
     }
 }

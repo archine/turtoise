@@ -6,26 +6,26 @@ import cn.gjing.excel.base.annotation.ExcelField;
 import cn.gjing.excel.base.aware.ExcelWriteContextAware;
 import cn.gjing.excel.base.context.ExcelWriterContext;
 import cn.gjing.excel.base.listener.write.ExcelStyleWriteListener;
+import cn.gjing.excel.base.meta.ExcelColor;
 import org.apache.poi.ss.usermodel.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Colorless style listener, Excel header and body use basic color.
- * the only difference is that Excel headers will be bold,
+ * Gray color style listener, Excel header use gray color, body use basic color.
  * set column width according to {@link ExcelField#width()},
  * set cell format according to {@link ExcelField#format()}
  *
  * @author Gjing
  **/
-public final class NoneColorExcelStyleListener implements ExcelStyleWriteListener, ExcelWriteContextAware {
+public final class GrayColorExcelStyleListener implements ExcelStyleWriteListener, ExcelWriteContextAware {
     private ExcelWriterContext writerContext;
     private final Map<Integer, CellStyle> titleStyles;
-    private CellStyle cellStyle;
+    private CellStyle headStyle;
     private final Map<String, CellStyle> bodyStyles;
 
-    public NoneColorExcelStyleListener() {
+    public GrayColorExcelStyleListener() {
         this.titleStyles = new HashMap<>(8);
         this.bodyStyles = new HashMap<>(16);
     }
@@ -33,11 +33,14 @@ public final class NoneColorExcelStyleListener implements ExcelStyleWriteListene
     @Override
     public void setContext(ExcelWriterContext writerContext) {
         this.writerContext = writerContext;
-        this.cellStyle = writerContext.getWorkbook().createCellStyle();
+        this.headStyle = writerContext.getWorkbook().createCellStyle();
+        this.headStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        this.headStyle.setFillForegroundColor(ExcelColor.GREY_50_PERCENT.index);
         Font font = writerContext.getWorkbook().createFont();
         font.setBold(true);
-        cellStyle.setFont(font);
-        StyleUtils.setAlignment(cellStyle);
+        this.headStyle.setFont(font);
+        StyleUtils.setAlignment(this.headStyle);
+        StyleUtils.setBorder(this.headStyle, ExcelColor.GREY_40_PERCENT);
     }
 
     @Override
@@ -68,7 +71,7 @@ public final class NoneColorExcelStyleListener implements ExcelStyleWriteListene
                 this.writerContext.getSheet().setDefaultColumnStyle(colIndex, this.createFormatStyle(property));
             }
         }
-        cell.setCellStyle(this.cellStyle);
+        cell.setCellStyle(this.headStyle);
     }
 
     @Override

@@ -6,5 +6,20 @@ package cn.gjing.excel.base.meta;
  * @author Gjing
  **/
 public enum ExecMode {
-    BIND, SIMPLE;
+    /**
+     * Bind mode
+     */
+    BIND,
+    /**
+     * Simple mode
+     */
+    SIMPLE,
+    /**
+     * Export mode
+     */
+    WRITE,
+    /**
+     * Read mode
+     */
+    READ;
 }

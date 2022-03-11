@@ -34,7 +34,7 @@ public abstract class ExcelBaseWriter {
         this.response = response;
         this.context = context;
         this.chooseResolver(context, windowSize, mode);
-        InitializerMeta.INSTANT.init(context.getListenerCache());
+        InitializerMeta.INSTANT.init(context.getExcelEntity(), ExecMode.WRITE, context.getListenerCache());
     }
 
     /**

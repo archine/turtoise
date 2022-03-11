@@ -2,27 +2,30 @@ package cn.gjing.excel.style;
 
 import cn.gjing.excel.base.BigTitle;
 import cn.gjing.excel.base.ExcelFieldProperty;
+import cn.gjing.excel.base.annotation.ExcelField;
 import cn.gjing.excel.base.aware.ExcelWriteContextAware;
 import cn.gjing.excel.base.context.ExcelWriterContext;
 import cn.gjing.excel.base.listener.write.ExcelStyleWriteListener;
+import cn.gjing.excel.base.meta.ExcelColor;
 import org.apache.poi.ss.usermodel.*;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
 
 /**
+ * Blue color style listener, Excel header use blue color, body use basic color.
+ * set column width according to {@link ExcelField#width()},
+ * set cell format according to {@link ExcelField#format()}
+ *
  * @author Gjing
  **/
-public final class CustomExcelStyleListener implements ExcelStyleWriteListener, ExcelWriteContextAware {
+public final class BlueColorExcelStyleListener implements ExcelStyleWriteListener, ExcelWriteContextAware {
     private ExcelWriterContext writerContext;
     private final Map<Integer, CellStyle> titleStyles;
-    private final Map<String, CellStyle> bodyStyles;
     private CellStyle headStyle;
-    private final BiConsumer<Workbook, CellStyle> headStyleSet;
+    private final Map<String, CellStyle> bodyStyles;
 
-    public CustomExcelStyleListener(BiConsumer<Workbook, CellStyle> headStyleSet) {
-        this.headStyleSet = headStyleSet;
+    public BlueColorExcelStyleListener() {
         this.titleStyles = new HashMap<>(8);
         this.bodyStyles = new HashMap<>(16);
     }
@@ -30,6 +33,14 @@ public final class CustomExcelStyleListener implements ExcelStyleWriteListener, 
     @Override
     public void setContext(ExcelWriterContext writerContext) {
         this.writerContext = writerContext;
+        this.headStyle = writerContext.getWorkbook().createCellStyle();
+        this.headStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        this.headStyle.setFillForegroundColor(ExcelColor.ROYAL_BLUE.index);
+        Font font = writerContext.getWorkbook().createFont();
+        font.setBold(true);
+        this.headStyle.setFont(font);
+        StyleUtils.setAlignment(this.headStyle);
+        StyleUtils.setBorder(this.headStyle, ExcelColor.GREY_40_PERCENT);
     }
 
     @Override
@@ -54,14 +65,10 @@ public final class CustomExcelStyleListener implements ExcelStyleWriteListener, 
 
     @Override
     public void setHeadStyle(Row row, Cell cell, ExcelFieldProperty property, int dataIndex, int colIndex) {
-        if (this.headStyle == null) {
-            this.headStyle = this.writerContext.getWorkbook().createCellStyle();
-            this.headStyleSet.accept(this.writerContext.getWorkbook(), this.headStyle);
-        }
         if (dataIndex == 0) {
             this.setColumnWidth(property, colIndex);
             if (this.writerContext.isTemplate()) {
-                this.writerContext.getSheet().setDefaultColumnStyle(colIndex, this.createBodyStyle(property));
+                this.writerContext.getSheet().setDefaultColumnStyle(colIndex, this.createFormatStyle(property));
             }
         }
         cell.setCellStyle(this.headStyle);
@@ -72,10 +79,10 @@ public final class CustomExcelStyleListener implements ExcelStyleWriteListener, 
         if (dataIndex == 0) {
             this.setColumnWidth(property, colIndex);
         }
-        cell.setCellStyle(this.createBodyStyle(property));
+        cell.setCellStyle(this.createFormatStyle(property));
     }
 
-    private CellStyle createBodyStyle(ExcelFieldProperty property) {
+    private CellStyle createFormatStyle(ExcelFieldProperty property) {
         CellStyle cellStyle = this.bodyStyles.get(property.getFormat());
         if (cellStyle == null) {
             cellStyle = this.writerContext.getWorkbook().createCellStyle();

@@ -80,8 +80,8 @@ class ExcelBindReadExecutor<R> extends ExcelBaseReadExecutor<R> {
                 continue;
             }
             try {
-                r = this.context.getExcelClass().newInstance();
-                context.setVariable(super.context.getExcelClass().getSimpleName(), r);
+                r = this.context.getExcelEntity().newInstance();
+                context.setVariable(super.context.getExcelEntity().getSimpleName(), r);
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new ExcelException("Excel entity init failure, " + e.getMessage());
             }

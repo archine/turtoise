@@ -7,7 +7,7 @@ import cn.gjing.excel.base.exception.ExcelTemplateException;
 import cn.gjing.excel.base.listener.read.ExcelReadListener;
 import cn.gjing.excel.base.meta.ExcelType;
 import cn.gjing.excel.base.meta.ExecMode;
-import cn.gjing.excel.base.meta.ListenerMeta;
+import cn.gjing.excel.base.meta.InitializerMeta;
 import cn.gjing.excel.executor.read.aware.ExcelReaderContextAware;
 import com.monitorjbl.xlsx.StreamingReader;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -34,8 +34,7 @@ public abstract class ExcelBaseReader<R> {
         this.context = context;
         this.inputStream = inputStream;
         this.chooseResolver(excelType, cacheRowSize, bufferSize, execMode);
-        ListenerMeta.initListeners(context.getListenerCache());
-        ListenerMeta.loadShareReadListener(context.getListenerCache());
+        InitializerMeta.INSTANT.init(context.getExcelEntity(), ExecMode.READ, context.getListenerCache());
     }
 
     /**

@@ -99,10 +99,10 @@ public final class BigTitle {
                 .build();
     }
 
-    public static BigTitle of(Object content, int lines, int firstRow, int firstCol) {
+    public static BigTitle of(Object content, int rowNum, int firstRow, int firstCol) {
         return BigTitle.builder()
                 .content(content)
-                .rowNum(lines)
+                .rowNum(rowNum)
                 .firstRow(firstRow)
                 .firstCol(firstCol)
                 .build();

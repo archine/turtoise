@@ -37,7 +37,7 @@ public interface ExcelCellWriteListener extends ExcelWriteListener {
      * @param rowType   Current row type
      * @param property  ExcelField property
      * @param value     Cell value
-     * @return Cell value, If null, no assignment will take place
+     * @return Cell value, if null, no assignment will take place
      */
     default Object assignmentBefore(Sheet sheet, Row row, Cell cell, ExcelFieldProperty property, int dataIndex, int colIndex, RowType rowType, Object value) {
         return value;

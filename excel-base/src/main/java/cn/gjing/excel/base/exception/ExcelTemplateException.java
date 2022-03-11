@@ -9,7 +9,7 @@ package cn.gjing.excel.base.exception;
  **/
 public class ExcelTemplateException extends ExcelException{
     public ExcelTemplateException() {
-        super("Excel templates do not match");
+        super("Excel template do not match");
     }
 
     public ExcelTemplateException(String message) {

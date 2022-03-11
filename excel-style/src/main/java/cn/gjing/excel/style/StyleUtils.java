@@ -1,8 +1,7 @@
 package cn.gjing.excel.style;
 
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
+import cn.gjing.excel.base.meta.ExcelColor;
+import org.apache.poi.ss.usermodel.*;
 
 /**
  * Excel style utils
@@ -21,5 +20,18 @@ public class StyleUtils {
         cellStyle.setWrapText(true);
     }
 
-
+    /**
+     * Set the border
+     *
+     * @param cellStyle cellStyle
+     * @param color     border color
+     */
+    public static void setBorder(CellStyle cellStyle, ExcelColor color) {
+        cellStyle.setBorderBottom(BorderStyle.THIN);
+        cellStyle.setBottomBorderColor(color.index);
+        cellStyle.setBorderLeft(BorderStyle.THIN);
+        cellStyle.setLeftBorderColor(color.index);
+        cellStyle.setBorderRight(BorderStyle.THIN);
+        cellStyle.setRightBorderColor(color.index);
+    }
 }
