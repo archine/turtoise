@@ -111,25 +111,25 @@ public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
     }
 
     /**
-     * Add readListeners
+     * Add excel read listener
      *
      * @param readListenerList Read listeners
      * @return this
      */
-    public ExcelBindReader<R> addListener(List<? extends ExcelReadListener> readListenerList) {
+    public ExcelBindReader<R> listener(List<? extends ExcelReadListener> readListenerList) {
         if (readListenerList != null) {
-            readListenerList.forEach(this::addListener);
+            readListenerList.forEach(this::listener);
         }
         return this;
     }
 
     /**
-     * Add readListeners
+     * Add excel read listener
      *
      * @param readListener Read listener
      * @return this
      */
-    public ExcelBindReader<R> addListener(ExcelReadListener readListener) {
+    public ExcelBindReader<R> listener(ExcelReadListener readListener) {
         super.context.addListener(readListener);
         super.initAware(readListener);
         return this;

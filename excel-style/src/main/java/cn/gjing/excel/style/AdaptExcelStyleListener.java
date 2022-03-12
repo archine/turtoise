@@ -70,8 +70,8 @@ public final class AdaptExcelStyleListener implements ExcelStyleWriteListener, E
     public void setHeadStyle(Row row, Cell cell, ExcelFieldProperty property, int dataIndex, int colIndex) {
         int colorLen = property.getColor().length;
         int fontColorLen = property.getFontColor().length;
-        ExcelColor backgroundColor = property.getColor()[dataIndex > colorLen ? colorLen - 1 : dataIndex];
-        ExcelColor fontColor = property.getFontColor()[dataIndex > fontColorLen ? fontColorLen - 1 : dataIndex];
+        ExcelColor backgroundColor = property.getColor()[dataIndex < colorLen ? dataIndex : colorLen - 1];
+        ExcelColor fontColor = property.getFontColor()[dataIndex < fontColorLen ? dataIndex : fontColorLen - 1];
         String key = backgroundColor.index + "|" + fontColor.index;
         CellStyle cellStyle = this.headStyles.get(key);
         if (cellStyle == null) {
@@ -82,7 +82,7 @@ public final class AdaptExcelStyleListener implements ExcelStyleWriteListener, E
             font.setBold(true);
             font.setColor(fontColor.index);
             cellStyle.setFont(font);
-            StyleUtils.setBorder(cellStyle,ExcelColor.GREY_40_PERCENT);
+            StyleUtils.setBorder(cellStyle, ExcelColor.GREY_40_PERCENT);
             StyleUtils.setAlignment(cellStyle);
             this.headStyles.put(key, cellStyle);
         }

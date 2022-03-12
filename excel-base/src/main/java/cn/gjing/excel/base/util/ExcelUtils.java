@@ -1,4 +1,4 @@
-package cn.gjing.excel.executor.util;
+package cn.gjing.excel.base.util;
 
 import cn.gjing.excel.base.meta.ExcelType;
 import org.apache.poi.common.usermodel.HyperlinkType;

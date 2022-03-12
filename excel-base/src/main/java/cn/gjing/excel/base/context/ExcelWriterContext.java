@@ -44,12 +44,12 @@ public final class ExcelWriterContext extends AbstractExcelContext {
     /**
      * Excel head row height
      */
-    private short headerHeight = 400;
+    private short headerHeight = 450;
 
     /**
      * Excel body row height
      */
-    private short bodyHeight = 370;
+    private short bodyHeight = 390;
 
     /**
      * Excel header series

@@ -35,7 +35,7 @@ public final class GrayColorExcelStyleListener implements ExcelStyleWriteListene
         this.writerContext = writerContext;
         this.headStyle = writerContext.getWorkbook().createCellStyle();
         this.headStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        this.headStyle.setFillForegroundColor(ExcelColor.GREY_50_PERCENT.index);
+        this.headStyle.setFillForegroundColor(ExcelColor.GREY_25_PERCENT.index);
         Font font = writerContext.getWorkbook().createFont();
         font.setBold(true);
         this.headStyle.setFont(font);

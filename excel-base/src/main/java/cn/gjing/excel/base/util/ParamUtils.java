@@ -1,4 +1,4 @@
-package cn.gjing.excel.executor.util;
+package cn.gjing.excel.base.util;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

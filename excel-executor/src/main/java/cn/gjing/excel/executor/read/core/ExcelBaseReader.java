@@ -1,5 +1,6 @@
 package cn.gjing.excel.executor.read.core;
 
+import cn.gjing.excel.base.aware.ExcelReaderContextAware;
 import cn.gjing.excel.base.aware.ExcelWorkbookAware;
 import cn.gjing.excel.base.context.ExcelReaderContext;
 import cn.gjing.excel.base.exception.ExcelException;
@@ -7,8 +8,7 @@ import cn.gjing.excel.base.exception.ExcelTemplateException;
 import cn.gjing.excel.base.listener.read.ExcelReadListener;
 import cn.gjing.excel.base.meta.ExcelType;
 import cn.gjing.excel.base.meta.ExecMode;
-import cn.gjing.excel.base.meta.InitializerMeta;
-import cn.gjing.excel.executor.read.aware.ExcelReaderContextAware;
+import cn.gjing.excel.base.meta.ExcelInitializerMeta;
 import com.monitorjbl.xlsx.StreamingReader;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException;
@@ -34,7 +34,7 @@ public abstract class ExcelBaseReader<R> {
         this.context = context;
         this.inputStream = inputStream;
         this.chooseResolver(excelType, cacheRowSize, bufferSize, execMode);
-        InitializerMeta.INSTANT.init(context.getExcelEntity(), ExecMode.READ, context.getListenerCache());
+        ExcelInitializerMeta.INSTANT.init(context.getExcelEntity(), ExecMode.READ, context.getListenerCache());
     }
 
     /**

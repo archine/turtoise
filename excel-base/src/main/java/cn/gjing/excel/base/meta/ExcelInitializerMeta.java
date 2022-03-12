@@ -11,10 +11,10 @@ import java.util.List;
  *
  * @author Gjing
  **/
-public enum InitializerMeta {
+public enum ExcelInitializerMeta {
     INSTANT;
 
-    InitializerMeta() {
+    ExcelInitializerMeta() {
         this.initializers = new ArrayList<>(5);
     }
 
@@ -26,7 +26,7 @@ public enum InitializerMeta {
      * @param listenerInitializer Excel listener initializer
      * @return this
      */
-    public InitializerMeta cache(ExcelListenerInitializer listenerInitializer) {
+    public ExcelInitializerMeta cache(ExcelListenerInitializer listenerInitializer) {
         this.initializers.add(listenerInitializer);
         return this;
     }

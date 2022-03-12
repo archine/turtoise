@@ -1,13 +1,13 @@
 package cn.gjing.excel.executor.write;
 
 import cn.gjing.excel.base.aware.ExcelWorkbookAware;
+import cn.gjing.excel.base.aware.ExcelWriteContextAware;
 import cn.gjing.excel.base.context.ExcelWriterContext;
 import cn.gjing.excel.base.listener.write.ExcelWriteListener;
+import cn.gjing.excel.base.meta.ExcelInitializerMeta;
 import cn.gjing.excel.base.meta.ExecMode;
-import cn.gjing.excel.base.meta.InitializerMeta;
-import cn.gjing.excel.executor.util.ListenerChain;
-import cn.gjing.excel.executor.util.ParamUtils;
-import cn.gjing.excel.executor.write.aware.ExcelWriteContextAware;
+import cn.gjing.excel.base.util.ListenerChain;
+import cn.gjing.excel.base.util.ParamUtils;
 import cn.gjing.excel.executor.write.core.ExcelWriteXlsResolver;
 import cn.gjing.excel.executor.write.core.ExcelWriteXlsxResolver;
 import cn.gjing.excel.executor.write.core.ExcelWriterResolver;
@@ -34,7 +34,8 @@ public abstract class ExcelBaseWriter {
         this.response = response;
         this.context = context;
         this.chooseResolver(context, windowSize, mode);
-        InitializerMeta.INSTANT.init(context.getExcelEntity(), ExecMode.WRITE, context.getListenerCache());
+        ExcelInitializerMeta.INSTANT.init(context.getExcelEntity(), ExecMode.WRITE, context.getListenerCache());
+        context.getListenerCache().forEach(e-> this.initAware((ExcelWriteListener) e));
     }
 
     /**

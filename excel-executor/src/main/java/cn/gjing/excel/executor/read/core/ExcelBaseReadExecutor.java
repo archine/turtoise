@@ -2,12 +2,13 @@ package cn.gjing.excel.executor.read.core;
 
 import cn.gjing.excel.base.context.ExcelReaderContext;
 import cn.gjing.excel.base.exception.ExcelException;
+import cn.gjing.excel.base.exception.ExcelTemplateException;
 import cn.gjing.excel.base.listener.ExcelListener;
 import cn.gjing.excel.base.meta.ExecMode;
 import cn.gjing.excel.base.meta.RowType;
-import cn.gjing.excel.executor.util.JsonUtils;
-import cn.gjing.excel.executor.util.ListenerChain;
-import cn.gjing.excel.executor.util.ParamUtils;
+import cn.gjing.excel.base.util.JsonUtils;
+import cn.gjing.excel.base.util.ListenerChain;
+import cn.gjing.excel.base.util.ParamUtils;
 import com.monitorjbl.xlsx.impl.StreamingWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -24,7 +25,7 @@ import java.util.List;
  **/
 public abstract class ExcelBaseReadExecutor<R> {
     protected final ExcelReaderContext<R> context;
-    protected Boolean saveCurrentRowObj;
+    protected boolean saveCurrentRowObj;
 
     public ExcelBaseReadExecutor(ExcelReaderContext<R> context) {
         this.context = context;
@@ -66,7 +67,7 @@ public abstract class ExcelBaseReadExecutor<R> {
     protected boolean readHeadBefore(List<ExcelListener> rowReadListeners, Row row) {
         if (this.context.isHeadBefore()) {
             for (Cell cell : row) {
-                Object value = this.getValue(null, cell, null, null, false, false, RowType.OTHER, ExecMode.SIMPLE);
+                Object value = this.getValue(null, cell, null, false, false, RowType.OTHER, ExecMode.SIMPLE);
                 ListenerChain.doReadCell(rowReadListeners, value, cell, row.getRowNum(), cell.getColumnIndex(), RowType.OTHER);
             }
             return ListenerChain.doReadRow(rowReadListeners, null, row, RowType.OTHER);
@@ -95,6 +96,22 @@ public abstract class ExcelBaseReadExecutor<R> {
         }
     }
 
+    protected void validTemplate() {
+        if (this.context.isCheckTemplate()) {
+            String key = "excelUnqSheet";
+            if (this.context.getWorkbook().getSheetIndex(key) == -1) {
+                throw new ExcelTemplateException();
+            }
+            for (Row row : this.context.getWorkbook().getSheet(key)) {
+                if (!ParamUtils.equals(ParamUtils.encodeMd5(this.context.getUniqueKey()), row.getCell(0).getStringCellValue(), false)) {
+                    throw new ExcelTemplateException();
+                }
+                break;
+            }
+            this.context.setCheckTemplate(false);
+        }
+    }
+
     /**
      * Get the value of the cell
      *
@@ -102,20 +119,19 @@ public abstract class ExcelBaseReadExecutor<R> {
      * @param trim     Remove white space on both sides of the string
      * @param required Cell content required
      * @param field    Current field
-     * @param header   Current header
      * @param r        Current row generated row
      * @param rowType  rowType Current row type
      * @param execMode Executor mode
      * @return value
      */
-    protected Object getValue(R r, Cell cell, Field field, String header, boolean trim, boolean required, RowType rowType, ExecMode execMode) {
+    protected Object getValue(R r, Cell cell, Field field, boolean trim, boolean required, RowType rowType, ExecMode execMode) {
         switch (cell.getCellType()) {
             case _NONE:
             case BLANK:
             case ERROR:
                 if (rowType == RowType.BODY) {
                     if (required) {
-                        this.saveCurrentRowObj = ListenerChain.doReadEmpty(this.context.getListenerCache(), r, header, cell);
+                        this.saveCurrentRowObj = ListenerChain.doReadEmpty(this.context.getListenerCache(), r, cell.getRowIndex(),cell.getColumnIndex());
                     }
                 }
                 break;

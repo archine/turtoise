@@ -70,7 +70,7 @@ public @interface ExcelField {
     String format() default "";
 
     /**
-     * Whether the content cell below the table header is mandatory.
+     * Whether the body cell below the table header is mandatory.
      * if true, the {@link ExcelEmptyReadListener} will be triggered if the content of the cell is detected as empty during import
      *
      * @return boolean

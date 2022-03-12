@@ -34,7 +34,7 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
     public ExcelSimpleWriter head(List<String[]> headNames) {
         if (headNames != null && !headNames.isEmpty()) {
             super.context.setHeaderSeries(headNames.get(0).length);
-            List<ExcelFieldProperty> properties = new ArrayList<>();
+            List<ExcelFieldProperty> properties = new ArrayList<>(headNames.size());
             for (String[] headName : headNames) {
                 properties.add(ExcelFieldProperty.builder()
                         .value(headName)
@@ -167,7 +167,7 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      * @param listener Write listener
      * @return this
      */
-    public ExcelSimpleWriter addListener(ExcelWriteListener listener) {
+    public ExcelSimpleWriter listener(ExcelWriteListener listener) {
         super.context.addListener(listener);
         super.initAware(listener);
         return this;
@@ -179,9 +179,9 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      * @param listeners Write listener list
      * @return this
      */
-    public ExcelSimpleWriter addListener(List<? extends ExcelWriteListener> listeners) {
+    public ExcelSimpleWriter listener(List<? extends ExcelWriteListener> listeners) {
         if (listeners != null) {
-            listeners.forEach(this::addListener);
+            listeners.forEach(this::listener);
         }
         return this;
     }

@@ -35,9 +35,10 @@ public final class BlueColorExcelStyleListener implements ExcelStyleWriteListene
         this.writerContext = writerContext;
         this.headStyle = writerContext.getWorkbook().createCellStyle();
         this.headStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        this.headStyle.setFillForegroundColor(ExcelColor.ROYAL_BLUE.index);
+        this.headStyle.setFillForegroundColor(ExcelColor.PALE_BLUE.index);
         Font font = writerContext.getWorkbook().createFont();
         font.setBold(true);
+        font.setColor(ExcelColor.GREY_80_PERCENT.index);
         this.headStyle.setFont(font);
         StyleUtils.setAlignment(this.headStyle);
         StyleUtils.setBorder(this.headStyle, ExcelColor.GREY_40_PERCENT);

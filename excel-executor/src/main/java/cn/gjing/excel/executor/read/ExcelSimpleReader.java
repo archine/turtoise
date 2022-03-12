@@ -89,9 +89,9 @@ public class ExcelSimpleReader<R> extends ExcelBaseReader<R> {
      * @param readListenerList Read listeners
      * @return this
      */
-    public ExcelSimpleReader<R> addListener(List<? extends ExcelReadListener> readListenerList) {
+    public ExcelSimpleReader<R> listener(List<? extends ExcelReadListener> readListenerList) {
         if (readListenerList != null) {
-            readListenerList.forEach(this::addListener);
+            readListenerList.forEach(this::listener);
         }
         return this;
     }
@@ -102,7 +102,7 @@ public class ExcelSimpleReader<R> extends ExcelBaseReader<R> {
      * @param readListener Read listener
      * @return this
      */
-    public ExcelSimpleReader<R> addListener(ExcelReadListener readListener) {
+    public ExcelSimpleReader<R> listener(ExcelReadListener readListener) {
         super.context.addListener(readListener);
         super.initAware(readListener);
         return this;

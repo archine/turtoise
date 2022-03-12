@@ -3,7 +3,7 @@ package cn.gjing.excel.executor.read.core;
 import cn.gjing.excel.base.context.ExcelReaderContext;
 import cn.gjing.excel.base.meta.ExecMode;
 import cn.gjing.excel.base.meta.RowType;
-import cn.gjing.excel.executor.util.ListenerChain;
+import cn.gjing.excel.base.util.ListenerChain;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
@@ -19,6 +19,7 @@ class ExcelSimpleReadExecutor<R> extends ExcelBaseReadExecutor<R> {
 
     @Override
     public void read(int headerIndex, String sheetName) {
+        super.validTemplate();
         super.checkSheet(sheetName);
         ListenerChain.doReadBefore(super.context.getListenerCache());
         boolean continueRead = true;
@@ -42,7 +43,7 @@ class ExcelSimpleReadExecutor<R> extends ExcelBaseReadExecutor<R> {
                 Cell cell = row.getCell(i);
                 Object value;
                 if (cell != null) {
-                    value = this.getValue(null, cell, null, head, false, false, RowType.BODY, ExecMode.SIMPLE);
+                    value = this.getValue(null, cell, null, false, false, RowType.BODY, ExecMode.SIMPLE);
                     ListenerChain.doReadCell(super.context.getListenerCache(), value, cell, row.getRowNum(), i, RowType.BODY);
                 } else {
                     ListenerChain.doReadCell(super.context.getListenerCache(), null, null, row.getRowNum(), i, RowType.BODY);

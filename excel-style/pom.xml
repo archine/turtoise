@@ -20,7 +20,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>cn.gjing.excel</groupId>
+            <groupId>cn.gjing</groupId>
             <artifactId>excel-base</artifactId>
             <version>2022.1.0</version>
             <optional>true</optional>

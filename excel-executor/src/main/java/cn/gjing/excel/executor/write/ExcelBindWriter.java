@@ -5,8 +5,8 @@ import cn.gjing.excel.base.annotation.Excel;
 import cn.gjing.excel.base.context.ExcelWriterContext;
 import cn.gjing.excel.base.listener.write.ExcelWriteListener;
 import cn.gjing.excel.base.meta.ExecMode;
+import cn.gjing.excel.base.util.BeanUtils;
 import cn.gjing.excel.executor.read.ExcelBindReader;
-import cn.gjing.excel.executor.util.BeanUtils;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletResponse;
@@ -152,7 +152,7 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
      * @param listener Write listener
      * @return this
      */
-    public ExcelBindWriter addListener(ExcelWriteListener listener) {
+    public ExcelBindWriter listener(ExcelWriteListener listener) {
         super.context.addListener(listener);
         super.initAware(listener);
         return this;
@@ -164,9 +164,9 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
      * @param listeners Write listener list
      * @return this
      */
-    public ExcelBindWriter addListener(List<? extends ExcelWriteListener> listeners) {
+    public ExcelBindWriter listener(List<? extends ExcelWriteListener> listeners) {
         if (listeners != null) {
-            listeners.forEach(this::addListener);
+            listeners.forEach(this::listener);
         }
         return this;
     }
