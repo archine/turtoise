@@ -14,7 +14,7 @@ public interface ExcelRowReadListener<R> extends ExcelReadListener {
     /**
      * Triggered when a row of data has been successfully read
      *
-     * @param r        The current row generates object that have value only in binding mode; simple mode does not generate object
+     * @param r        The current row generates instance that have value only in binding mode; simple mode does not generate object
      * @param row      The current row
      * @param rowIndex The current row index
      * @param rowType  Current row type
