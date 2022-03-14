@@ -50,6 +50,7 @@ public final class BeanUtils {
      *
      * @param excelClass Excel mapped entity
      * @param ignores    The exported field is to be ignored
+     * @return Excel filed properties
      */
     public static List<ExcelFieldProperty> getExcelFiledProperties(Class<?> excelClass, String[] ignores) {
         List<ExcelFieldProperty> fieldProperties = new ArrayList<>();
@@ -64,7 +65,7 @@ public final class BeanUtils {
                             return;
                         }
                     }
-                   fieldProperties.add(ExcelFieldProperty.builder()
+                    fieldProperties.add(ExcelFieldProperty.builder()
                             .value(excelField.value())
                             .field(e)
                             .title(excelField.title())
