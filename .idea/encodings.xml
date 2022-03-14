@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding" defaultCharsetForPropertiesFiles="UTF-8">
+    <file url="file://$PROJECT_DIR$/excel-annotation/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/excel-base/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/excel-base/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/excel-executor/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/excel-executor/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/excel-spring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/excel-spring/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/excel-style/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/excel-style/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
     <file url="PROJECT" charset="UTF-8" />
