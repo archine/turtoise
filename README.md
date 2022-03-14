@@ -3,6 +3,6 @@
 
 **可以帮你提高编码效率的Java Excel框架库**   
 
-**详细文档请前往：[文档](https://www.yuque.com/u2499047/vg7hs6/xx59dg)**
+**详细文档请前往：[文档](https://www.yuque.com/u2499047/vg7hs6)**
 
 ---
