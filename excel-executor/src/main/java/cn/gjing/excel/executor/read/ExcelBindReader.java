@@ -103,10 +103,11 @@ public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
      * @return this
      **/
     public ExcelBindReader<R> check(String key) {
-        super.context.setCheckTemplate(true);
-        if (StringUtils.hasLength(key)) {
-            this.context.setUniqueKey(key);
+        if (!StringUtils.hasText(key)) {
+            throw new IllegalArgumentException("Unique key cannot be empty");
         }
+        super.context.setCheckTemplate(true);
+        super.context.setUniqueKey(key);
         return this;
     }
 

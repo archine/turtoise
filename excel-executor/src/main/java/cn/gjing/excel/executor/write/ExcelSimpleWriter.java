@@ -195,10 +195,11 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      * @return this
      */
     public ExcelSimpleWriter bind(String key) {
-        if (StringUtils.hasLength(key)) {
-            super.context.setUniqueKey(key);
-            super.context.setBind(true);
+        if (!StringUtils.hasText(key)) {
+            throw new IllegalArgumentException("Unique key cannot be empty");
         }
+        super.context.setUniqueKey(key);
+        super.context.setBind(true);
         return this;
     }
 

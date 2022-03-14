@@ -70,18 +70,4 @@ public class ExcelReaderContext<R> extends AbstractExcelContext {
         this.checkTemplate = false;
         this.headBefore = false;
     }
-
-    public ExcelReaderContext(List<String> headNames, Class<R> excelEntity, Map<String, Field> excelFieldMap, boolean checkTemplate,
-                              boolean headBefore, String uniqueKey, String[] ignores,
-                              ExcelResultReadListener<R> resultReadListener) {
-        super();
-        this.headNames = headNames;
-        this.excelEntity = excelEntity;
-        this.excelFieldMap = excelFieldMap;
-        this.checkTemplate = checkTemplate;
-        this.headBefore = headBefore;
-        this.uniqueKey = uniqueKey;
-        this.ignores = ignores;
-        this.resultReadListener = resultReadListener;
-    }
 }

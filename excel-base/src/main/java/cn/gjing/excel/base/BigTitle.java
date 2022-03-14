@@ -55,7 +55,7 @@ public final class BigTitle {
      * Background color
      */
     @Builder.Default
-    private ExcelColor color = ExcelColor.WHITE;
+    private ExcelColor color = ExcelColor.NONE;
 
     /**
      * The height of each row before merging

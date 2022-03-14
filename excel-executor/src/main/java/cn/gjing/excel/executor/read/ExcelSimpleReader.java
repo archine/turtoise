@@ -1,11 +1,13 @@
 package cn.gjing.excel.executor.read;
 
 import cn.gjing.excel.base.context.ExcelReaderContext;
+import cn.gjing.excel.base.exception.ExcelTemplateException;
 import cn.gjing.excel.base.listener.read.ExcelReadListener;
 import cn.gjing.excel.base.listener.read.ExcelRowReadListener;
 import cn.gjing.excel.base.meta.ExcelType;
 import cn.gjing.excel.base.meta.ExecMode;
 import cn.gjing.excel.executor.read.core.ExcelBaseReader;
+import org.springframework.util.StringUtils;
 
 import java.io.InputStream;
 import java.util.List;
@@ -80,6 +82,22 @@ public class ExcelSimpleReader<R> extends ExcelBaseReader<R> {
      */
     public ExcelSimpleReader<R> headBefore(boolean need) {
         super.context.setHeadBefore(need);
+        return this;
+    }
+
+    /**
+     * Check whether the imported Excel file matches the Excel mapping entity class.
+     * Thrown {@link ExcelTemplateException} if is don't match.
+     *
+     * @param key Unique key
+     * @return this
+     **/
+    public ExcelSimpleReader<R> check(String key) {
+        if (!StringUtils.hasText(key)) {
+            throw new IllegalArgumentException("Unique key cannot be empty");
+        }
+        super.context.setCheckTemplate(true);
+        super.context.setUniqueKey(key);
         return this;
     }
 

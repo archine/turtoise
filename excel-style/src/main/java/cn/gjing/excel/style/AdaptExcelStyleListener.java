@@ -51,8 +51,10 @@ public final class AdaptExcelStyleListener implements ExcelStyleWriteListener, E
         CellStyle titleStyle = titleStyles.get(bigTitle.getStyleIndex());
         if (titleStyle == null) {
             titleStyle = this.context.getWorkbook().createCellStyle();
-            titleStyle.setFillForegroundColor(bigTitle.getColor().index);
-            titleStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            if (bigTitle.getColor() != ExcelColor.NONE) {
+                titleStyle.setFillForegroundColor(bigTitle.getColor().index);
+                titleStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            }
             titleStyle.setAlignment(bigTitle.getAlignment());
             titleStyle.setWrapText(true);
             Font font = this.context.getWorkbook().createFont();

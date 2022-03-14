@@ -48,8 +48,10 @@ public final class GrayColorExcelStyleListener implements ExcelStyleWriteListene
         CellStyle titleStyle = titleStyles.get(bigTitle.getStyleIndex());
         if (titleStyle == null) {
             titleStyle = this.writerContext.getWorkbook().createCellStyle();
-            titleStyle.setFillForegroundColor(bigTitle.getColor().index);
-            titleStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            if (bigTitle.getColor() != ExcelColor.NONE) {
+                titleStyle.setFillForegroundColor(bigTitle.getColor().index);
+                titleStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            }
             titleStyle.setAlignment(bigTitle.getAlignment());
             titleStyle.setWrapText(true);
             Font font = this.writerContext.getWorkbook().createFont();

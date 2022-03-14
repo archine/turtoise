@@ -6,6 +6,7 @@ import cn.gjing.excel.base.annotation.ExcelField;
 import cn.gjing.excel.base.aware.ExcelWriteContextAware;
 import cn.gjing.excel.base.context.ExcelWriterContext;
 import cn.gjing.excel.base.listener.write.ExcelStyleWriteListener;
+import cn.gjing.excel.base.meta.ExcelColor;
 import org.apache.poi.ss.usermodel.*;
 
 import java.util.HashMap;
@@ -45,8 +46,10 @@ public final class NoneColorExcelStyleListener implements ExcelStyleWriteListene
         CellStyle titleStyle = titleStyles.get(bigTitle.getStyleIndex());
         if (titleStyle == null) {
             titleStyle = this.writerContext.getWorkbook().createCellStyle();
-            titleStyle.setFillForegroundColor(bigTitle.getColor().index);
-            titleStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            if (bigTitle.getColor() != ExcelColor.NONE) {
+                titleStyle.setFillForegroundColor(bigTitle.getColor().index);
+                titleStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            }
             titleStyle.setAlignment(bigTitle.getAlignment());
             titleStyle.setWrapText(true);
             Font font = this.writerContext.getWorkbook().createFont();
