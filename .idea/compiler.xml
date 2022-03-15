@@ -8,8 +8,9 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="excel-style" />
-        <module name="excel-base" />
+        <module name="excel-temp-valid" />
         <module name="excel-executor" />
+        <module name="excel-base" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
