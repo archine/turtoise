@@ -3,7 +3,9 @@ package cn.gjing.excel.executor.write;
 import cn.gjing.excel.base.BigTitle;
 import cn.gjing.excel.base.annotation.Excel;
 import cn.gjing.excel.base.context.ExcelWriterContext;
+import cn.gjing.excel.base.listener.ExcelListener;
 import cn.gjing.excel.base.listener.write.ExcelWriteListener;
+import cn.gjing.excel.base.meta.ExcelInitializerMeta;
 import cn.gjing.excel.base.meta.ExecMode;
 import cn.gjing.excel.base.util.BeanUtils;
 import cn.gjing.excel.executor.read.ExcelBindReader;
@@ -12,6 +14,7 @@ import org.springframework.util.StringUtils;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 /**
  * Excel bind mode writer.
@@ -102,13 +105,13 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
     }
 
     /**
-     * Reset Excel mapped entity, File names and unique keys (if present) do not change
+     * Reset Excel entity, file names and unique keys (if present) do not change
      *
      * @param excelEntity Excel entity
      * @param ignores     The exported field is to be ignored
      * @return this
      */
-    public ExcelBindWriter resetExcelEntity(Class<?> excelEntity, String... ignores) {
+    public ExcelBindWriter resetEntity(Class<?> excelEntity, String... ignores) {
         Excel excel = excelEntity.getAnnotation(Excel.class);
         Objects.requireNonNull(excel, "Failed to reset Excel class, the @Excel annotation was not found on the " + excelEntity);
         super.context.setFieldProperties(BeanUtils.getExcelFiledProperties(excelEntity, ignores));
@@ -117,6 +120,32 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
         super.context.setHeaderHeight(excel.headerHeight());
         super.context.setHeaderSeries(super.context.getFieldProperties().get(0).getValue().length);
         return this;
+    }
+
+    /**
+     * Clears listeners in the current context, which triggers the listener initializer again.
+     * <p>
+     * Excel entities in the current context are passed to the listener initializer,
+     * so they should be called after the {@link #resetEntity(Class, String...)} method.
+     *
+     * @param predicate The assertion condition, true, is removed
+     * @return this
+     */
+    public ExcelBindWriter resetListeners(Predicate<ExcelListener> predicate) {
+        super.context.getListenerCache().removeIf(predicate);
+        ExcelInitializerMeta.INSTANT.init(super.context.getExcelEntity(), ExecMode.WRITE, super.context.getListenerCache());
+        return this;
+    }
+
+    /**
+     * Clears all listeners in the current context, which triggers the listener initializer again
+     * <p>
+     * Excel entities in the current context are passed to the listener initializer, so they should be called after the resetEntity method
+     *
+     * @return this
+     */
+    public ExcelBindWriter resetListeners() {
+        return this.resetListeners((l) -> true);
     }
 
     /**
