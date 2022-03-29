@@ -5,8 +5,10 @@ import cn.gjing.excel.base.ExcelFieldProperty;
 import cn.gjing.excel.base.annotation.ExcelField;
 import cn.gjing.excel.base.aware.ExcelWriteContextAware;
 import cn.gjing.excel.base.context.ExcelWriterContext;
+import cn.gjing.excel.base.listener.write.ExcelSheetWriteListener;
 import cn.gjing.excel.base.listener.write.ExcelStyleWriteListener;
 import cn.gjing.excel.base.meta.ExcelColor;
+import cn.gjing.excel.style.util.StyleUtils;
 import org.apache.poi.ss.usermodel.*;
 
 import java.util.HashMap;
@@ -14,14 +16,16 @@ import java.util.Map;
 
 /**
  * Adapt the style listener, header color is affected by {@link ExcelField#color()} {@link ExcelField#fontColor()} color configuration,
- * excel header font bold,
- * set column width according to {@link ExcelField#width()},
- * set cell format according to {@link ExcelField#format()},
+ * set column width according to {@link ExcelField#width()}, set when writing out the Excel header,
+ * set cell format according to {@link ExcelField#format()}.
+ * <p>
+ * When used with the {@link ExcelSheetWriteListener}, all cells outside the header cell and the header column are locked,
+ * user can only operate on the cells below the header column.
  *
  * @author Gjing
  **/
 public final class AdaptExcelStyleListener implements ExcelStyleWriteListener, ExcelWriteContextAware {
-    private ExcelWriterContext context;
+    private ExcelWriterContext writerContext;
     /**
      * Big title style cache, key for style index
      */
@@ -41,23 +45,29 @@ public final class AdaptExcelStyleListener implements ExcelStyleWriteListener, E
         this.titleStyles = new HashMap<>(8);
     }
 
+    public AdaptExcelStyleListener(int headStyleCacheCapacity, int bodyStyleCacheCapacity, int titleStyleCacheCapacity) {
+        this.titleStyles = new HashMap<>(titleStyleCacheCapacity);
+        this.bodyStyles = new HashMap<>(bodyStyleCacheCapacity);
+        this.headStyles = new HashMap<>(headStyleCacheCapacity);
+    }
+
     @Override
     public void setContext(ExcelWriterContext writerContext) {
-        this.context = writerContext;
+        this.writerContext = writerContext;
     }
 
     @Override
     public void setTitleStyle(BigTitle bigTitle, Cell cell) {
         CellStyle titleStyle = titleStyles.get(bigTitle.getStyleIndex());
         if (titleStyle == null) {
-            titleStyle = this.context.getWorkbook().createCellStyle();
+            titleStyle = this.writerContext.getWorkbook().createCellStyle();
             if (bigTitle.getColor() != ExcelColor.NONE) {
                 titleStyle.setFillForegroundColor(bigTitle.getColor().index);
                 titleStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
             }
             titleStyle.setAlignment(bigTitle.getAlignment());
             titleStyle.setWrapText(true);
-            Font font = this.context.getWorkbook().createFont();
+            Font font = this.writerContext.getWorkbook().createFont();
             font.setColor(bigTitle.getFontColor().index);
             font.setBold(bigTitle.isBold());
             font.setFontHeight(bigTitle.getFontHeight());
@@ -70,6 +80,12 @@ public final class AdaptExcelStyleListener implements ExcelStyleWriteListener, E
 
     @Override
     public void setHeadStyle(Row row, Cell cell, ExcelFieldProperty property, int dataIndex, int colIndex) {
+        if (dataIndex == 0) {
+            StyleUtils.setColumnWidth(property, colIndex, this.writerContext);
+            if (this.writerContext.isTemplate()) {
+                this.writerContext.getSheet().setDefaultColumnStyle(colIndex, StyleUtils.createCacheStyle(property, this.bodyStyles, this.writerContext));
+            }
+        }
         int colorLen = property.getColor().length;
         int fontColorLen = property.getFontColor().length;
         ExcelColor backgroundColor = property.getColor()[dataIndex < colorLen ? dataIndex : colorLen - 1];
@@ -77,10 +93,10 @@ public final class AdaptExcelStyleListener implements ExcelStyleWriteListener, E
         String key = backgroundColor.index + "|" + fontColor.index;
         CellStyle cellStyle = this.headStyles.get(key);
         if (cellStyle == null) {
-            cellStyle = this.context.getWorkbook().createCellStyle();
+            cellStyle = this.writerContext.getWorkbook().createCellStyle();
             cellStyle.setFillForegroundColor(backgroundColor.index);
             cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-            Font font = this.context.getWorkbook().createFont();
+            Font font = this.writerContext.getWorkbook().createFont();
             font.setBold(true);
             font.setColor(fontColor.index);
             cellStyle.setFont(font);
@@ -88,40 +104,11 @@ public final class AdaptExcelStyleListener implements ExcelStyleWriteListener, E
             StyleUtils.setAlignment(cellStyle);
             this.headStyles.put(key, cellStyle);
         }
-        if (dataIndex == 0) {
-            this.setColumnWidth(property, colIndex);
-            if (this.context.isTemplate()) {
-                this.context.getSheet().setDefaultColumnStyle(colIndex, this.createBodyStyle(property));
-            }
-        }
         cell.setCellStyle(cellStyle);
     }
 
     @Override
     public void setBodyStyle(Row row, Cell cell, ExcelFieldProperty property, int dataIndex, int colIndex) {
-        if (dataIndex == 0) {
-            this.setColumnWidth(property, colIndex);
-        }
-        cell.setCellStyle(this.createBodyStyle(property));
-    }
-
-    private CellStyle createBodyStyle(ExcelFieldProperty property) {
-        CellStyle cellStyle = this.bodyStyles.get(property.getFormat());
-        if (cellStyle == null) {
-            cellStyle = this.context.getWorkbook().createCellStyle();
-            StyleUtils.setAlignment(cellStyle);
-            if (!property.getFormat().isEmpty()) {
-                cellStyle.setDataFormat(this.context.getWorkbook().createDataFormat().getFormat(property.getFormat()));
-            }
-            this.bodyStyles.put(property.getFormat(), cellStyle);
-        }
-        return cellStyle;
-    }
-
-    private void setColumnWidth(ExcelFieldProperty property, int colIndex) {
-        int defaultColumnWidth = this.context.getSheet().getColumnWidth(colIndex);
-        if (property.getWidth() > defaultColumnWidth) {
-            this.context.getSheet().setColumnWidth(colIndex, property.getWidth());
-        }
+        cell.setCellStyle(StyleUtils.createCacheStyle(property, this.bodyStyles, this.writerContext));
     }
 }

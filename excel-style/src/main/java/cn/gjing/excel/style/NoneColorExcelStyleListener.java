@@ -5,8 +5,10 @@ import cn.gjing.excel.base.ExcelFieldProperty;
 import cn.gjing.excel.base.annotation.ExcelField;
 import cn.gjing.excel.base.aware.ExcelWriteContextAware;
 import cn.gjing.excel.base.context.ExcelWriterContext;
+import cn.gjing.excel.base.listener.write.ExcelSheetWriteListener;
 import cn.gjing.excel.base.listener.write.ExcelStyleWriteListener;
 import cn.gjing.excel.base.meta.ExcelColor;
+import cn.gjing.excel.style.util.StyleUtils;
 import org.apache.poi.ss.usermodel.*;
 
 import java.util.HashMap;
@@ -14,9 +16,12 @@ import java.util.Map;
 
 /**
  * Colorless style listener, Excel header and body use basic color.
- * the only difference is that Excel headers will be bold,
- * set column width according to {@link ExcelField#width()},
+ * the only difference is that Excel header names will be bold,
+ * set column width according to {@link ExcelField#width()}, set when writing out the Excel header,
  * set cell format according to {@link ExcelField#format()}
+ * <p>
+ * When used with the {@link ExcelSheetWriteListener}, all cells outside the header cell and the header column are locked,
+ * user can only operate on the cells below the header column.
  *
  * @author Gjing
  **/
@@ -29,6 +34,11 @@ public final class NoneColorExcelStyleListener implements ExcelStyleWriteListene
     public NoneColorExcelStyleListener() {
         this.titleStyles = new HashMap<>(8);
         this.bodyStyles = new HashMap<>(16);
+    }
+
+    public NoneColorExcelStyleListener(int bodyStyleCacheCapacity, int titleStyleCacheCapacity) {
+        this.titleStyles = new HashMap<>(titleStyleCacheCapacity);
+        this.bodyStyles = new HashMap<>(bodyStyleCacheCapacity);
     }
 
     @Override
@@ -66,9 +76,9 @@ public final class NoneColorExcelStyleListener implements ExcelStyleWriteListene
     @Override
     public void setHeadStyle(Row row, Cell cell, ExcelFieldProperty property, int dataIndex, int colIndex) {
         if (dataIndex == 0) {
-            this.setColumnWidth(property, colIndex);
+            StyleUtils.setColumnWidth(property, colIndex, this.writerContext);
             if (this.writerContext.isTemplate()) {
-                this.writerContext.getSheet().setDefaultColumnStyle(colIndex, this.createFormatStyle(property));
+                this.writerContext.getSheet().setDefaultColumnStyle(colIndex, StyleUtils.createCacheStyle(property, this.bodyStyles, this.writerContext));
             }
         }
         cell.setCellStyle(this.cellStyle);
@@ -76,29 +86,6 @@ public final class NoneColorExcelStyleListener implements ExcelStyleWriteListene
 
     @Override
     public void setBodyStyle(Row row, Cell cell, ExcelFieldProperty property, int dataIndex, int colIndex) {
-        if (dataIndex == 0) {
-            this.setColumnWidth(property, colIndex);
-        }
-        cell.setCellStyle(this.createFormatStyle(property));
-    }
-
-    private CellStyle createFormatStyle(ExcelFieldProperty property) {
-        CellStyle cellStyle = this.bodyStyles.get(property.getFormat());
-        if (cellStyle == null) {
-            cellStyle = this.writerContext.getWorkbook().createCellStyle();
-            StyleUtils.setAlignment(cellStyle);
-            if (!property.getFormat().isEmpty()) {
-                cellStyle.setDataFormat(this.writerContext.getWorkbook().createDataFormat().getFormat(property.getFormat()));
-            }
-            this.bodyStyles.put(property.getFormat(), cellStyle);
-        }
-        return cellStyle;
-    }
-
-    private void setColumnWidth(ExcelFieldProperty property, int colIndex) {
-        int defaultColumnWidth = this.writerContext.getSheet().getColumnWidth(colIndex);
-        if (property.getWidth() > defaultColumnWidth) {
-            this.writerContext.getSheet().setColumnWidth(colIndex, property.getWidth());
-        }
+        cell.setCellStyle(StyleUtils.createCacheStyle(property, this.bodyStyles, this.writerContext));
     }
 }
