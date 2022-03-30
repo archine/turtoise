@@ -26,7 +26,7 @@ import java.util.function.Predicate;
 public final class ExcelBindWriter extends ExcelBaseWriter {
 
     public ExcelBindWriter(ExcelWriterContext context, Excel excel, HttpServletResponse response) {
-        super(context, excel.windowSize(), response, ExecMode.BIND);
+        super(context, excel.windowSize(), response, ExecMode.BIND_WRITE);
     }
 
     /**
@@ -134,7 +134,7 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
      */
     public ExcelBindWriter resetListeners(Predicate<ExcelListener> predicate) {
         super.context.getListenerCache().removeIf(predicate);
-        ExcelInitializerMeta.INSTANT.init(super.context.getExcelEntity(), ExecMode.WRITE, super.context.getListenerCache());
+        ExcelInitializerMeta.INSTANT.initListener(super.context.getExcelEntity(), ExecMode.BIND_WRITE, super.context.getListenerCache());
         return this;
     }
 

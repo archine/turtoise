@@ -43,7 +43,7 @@ class ExcelSimpleReadExecutor<R> extends ExcelBaseReadExecutor<R> {
                 Cell cell = row.getCell(i);
                 Object value;
                 if (cell != null) {
-                    value = this.getValue(null, cell, null, false, false, RowType.BODY, ExecMode.SIMPLE);
+                    value = this.getValue(null, cell, null, false, false, RowType.BODY, ExecMode.SIMPLE_READ);
                     ListenerChain.doReadCell(super.context.getListenerCache(), value, cell, row.getRowNum(), i, RowType.BODY);
                 } else {
                     ListenerChain.doReadCell(super.context.getListenerCache(), null, null, row.getRowNum(), i, RowType.BODY);

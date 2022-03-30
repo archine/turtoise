@@ -34,7 +34,7 @@ public abstract class ExcelBaseReader<R> {
         this.context = context;
         this.inputStream = inputStream;
         this.chooseResolver(excelType, cacheRowSize, bufferSize, execMode);
-        ExcelInitializerMeta.INSTANT.init(context.getExcelEntity(), ExecMode.READ, context.getListenerCache());
+        ExcelInitializerMeta.INSTANT.initListener(context.getExcelEntity(), execMode, context.getListenerCache());
     }
 
     /**
@@ -78,7 +78,7 @@ public abstract class ExcelBaseReader<R> {
             default:
                 throw new ExcelException("Excel type cannot be null");
         }
-        this.baseReadExecutor = execMode == ExecMode.BIND ? new ExcelBindReadExecutor<>(this.context) : new ExcelSimpleReadExecutor<>(this.context);
+        this.baseReadExecutor = execMode == ExecMode.BIND_READ ? new ExcelBindReadExecutor<>(this.context) : new ExcelSimpleReadExecutor<>(this.context);
     }
 
     @SuppressWarnings("unchecked")

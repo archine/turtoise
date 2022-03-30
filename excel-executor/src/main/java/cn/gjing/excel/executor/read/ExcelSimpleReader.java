@@ -23,7 +23,7 @@ import java.util.List;
  **/
 public class ExcelSimpleReader<R> extends ExcelBaseReader<R> {
     public ExcelSimpleReader(ExcelReaderContext<R> context, InputStream inputStream, ExcelType excelType, int cacheRowSize, int bufferSize) {
-        super(context, inputStream, excelType, cacheRowSize, bufferSize, ExecMode.SIMPLE);
+        super(context, inputStream, excelType, cacheRowSize, bufferSize, ExecMode.SIMPLE_READ);
     }
 
     /**

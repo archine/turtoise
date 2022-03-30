@@ -7,19 +7,19 @@ package cn.gjing.excel.base.meta;
  **/
 public enum ExecMode {
     /**
-     * Bind mode
+     * Binding mode write
      */
-    BIND,
+    BIND_WRITE,
     /**
-     * Simple mode
+     * Binding mode read
      */
-    SIMPLE,
+    BIND_READ,
     /**
-     * Export mode
+     * Simple mode write
      */
-    WRITE,
+    SIMPLE_WRITE,
     /**
-     * Read mode
+     * Simple mode read
      */
-    READ;
+    SIMPLE_READ;
 }

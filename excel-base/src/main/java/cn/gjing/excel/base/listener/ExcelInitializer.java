@@ -18,7 +18,7 @@ public interface ExcelInitializer {
      * Initialize the listener list
      *
      * @param excelEntity    Current Excel entity, Null in simple mode
-     * @param execMode       Current execution mode, available values: Write, read
+     * @param execMode       Current execution mode
      * @param excelListeners excel listeners
      */
     void initListeners(Class<?> excelEntity, ExecMode execMode, List<ExcelListener> excelListeners);
@@ -27,7 +27,7 @@ public interface ExcelInitializer {
      * Initialize the global Excel file version
      *
      * @param excelEntity Current Excel entity, Null in simple mode
-     * @param execMode    Current execution mode, available values: Write, read
+     * @param execMode    Current execution mode
      * @return Returning NULL will be set according to {@link Excel#type()}, in simple mode, follow the Settings in Excel factory
      */
     default ExcelType initExcelType(Class<?> excelEntity, ExecMode execMode) {

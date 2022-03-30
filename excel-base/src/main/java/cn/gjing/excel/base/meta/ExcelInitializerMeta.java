@@ -37,7 +37,7 @@ public enum ExcelInitializerMeta {
      * @param execMode       Current execution mode
      * @param excelListeners excel listeners
      */
-    public void init(Class<?> excelEntity, ExecMode execMode, List<ExcelListener> excelListeners) {
+    public void initListener(Class<?> excelEntity, ExecMode execMode, List<ExcelListener> excelListeners) {
         if (this.excelInitializer == null) {
             return;
         }

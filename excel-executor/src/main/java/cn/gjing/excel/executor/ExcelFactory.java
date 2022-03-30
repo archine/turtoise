@@ -5,9 +5,7 @@ import cn.gjing.excel.base.context.ExcelReaderContext;
 import cn.gjing.excel.base.context.ExcelWriterContext;
 import cn.gjing.excel.base.exception.ExcelException;
 import cn.gjing.excel.base.exception.ExcelTemplateException;
-import cn.gjing.excel.base.meta.ExcelInitializerMeta;
 import cn.gjing.excel.base.meta.ExcelType;
-import cn.gjing.excel.base.meta.ExecMode;
 import cn.gjing.excel.base.util.BeanUtils;
 import cn.gjing.excel.base.util.ExcelUtils;
 import cn.gjing.excel.executor.read.ExcelBindReader;
@@ -68,7 +66,6 @@ public final class ExcelFactory {
         ExcelWriterContext context = new ExcelWriterContext();
         context.setExcelEntity(excelEntity);
         context.setFieldProperties(BeanUtils.getExcelFiledProperties(excelEntity, ignores));
-        context.setExcelType(ExcelInitializerMeta.INSTANT.initType(excelEntity, ExecMode.WRITE) == null ? excel.type() : ExcelInitializerMeta.INSTANT.initType(excelEntity, ExecMode.WRITE));
         context.setFileName(StringUtils.hasText(fileName) ? fileName : "".equals(excel.value()) ? LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : excel.value());
         context.setHeaderHeight(excel.headerHeight());
         context.setHeaderSeries(context.getFieldProperties().get(0).getValue().length);
@@ -114,8 +111,7 @@ public final class ExcelFactory {
     public static ExcelSimpleWriter createSimpleWriter(String fileName, HttpServletResponse response, ExcelType excelType, int windowSize) {
         ExcelWriterContext context = new ExcelWriterContext();
         context.setFileName(StringUtils.hasText(fileName) ? fileName : LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        context.setExcelType(ExcelInitializerMeta.INSTANT.initType(null, ExecMode.WRITE) == null ? excelType : ExcelInitializerMeta.INSTANT.initType(null, ExecMode.WRITE));
-        context.setExcelEntity(Object.class);
+        context.setExcelEntity(null);
         context.setBind(false);
         return new ExcelSimpleWriter(context, windowSize, response);
     }

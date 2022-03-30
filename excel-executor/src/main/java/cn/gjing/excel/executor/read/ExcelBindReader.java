@@ -22,7 +22,7 @@ import java.util.List;
  **/
 public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
     public ExcelBindReader(ExcelReaderContext<R> context, InputStream inputStream, ExcelType excelType, int cacheRowSize, int bufferSize) {
-        super(context, inputStream, excelType, cacheRowSize, bufferSize, ExecMode.BIND);
+        super(context, inputStream, excelType, cacheRowSize, bufferSize, ExecMode.BIND_READ);
     }
 
     /**

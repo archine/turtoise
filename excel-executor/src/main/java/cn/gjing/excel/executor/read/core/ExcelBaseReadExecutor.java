@@ -67,7 +67,7 @@ public abstract class ExcelBaseReadExecutor<R> {
     protected boolean readHeadBefore(List<ExcelListener> rowReadListeners, Row row) {
         if (this.context.isHeadBefore()) {
             for (Cell cell : row) {
-                Object value = this.getValue(null, cell, null, false, false, RowType.OTHER, ExecMode.SIMPLE);
+                Object value = this.getValue(null, cell, null, false, false, RowType.OTHER, ExecMode.SIMPLE_READ);
                 ListenerChain.doReadCell(rowReadListeners, value, cell, row.getRowNum(), cell.getColumnIndex(), RowType.OTHER);
             }
             return ListenerChain.doReadRow(rowReadListeners, null, row, RowType.OTHER);
@@ -141,12 +141,12 @@ public abstract class ExcelBaseReadExecutor<R> {
                 if (DateUtil.isCellDateFormatted(cell)) {
                     return cell.getDateCellValue();
                 }
-                if (execMode == ExecMode.BIND) {
+                if (execMode == ExecMode.BIND_READ) {
                     return rowType == RowType.BODY ? JsonUtils.toObj(JsonUtils.toJson(cell.getNumericCellValue()), field.getType()) : cell.getNumericCellValue();
                 }
                 return cell.getNumericCellValue();
             case FORMULA:
-                if (execMode == ExecMode.BIND) {
+                if (execMode == ExecMode.BIND_READ) {
                     return rowType == RowType.BODY ? JsonUtils.toObj(JsonUtils.toJson(cell.getStringCellValue()), field.getType()) : cell.getStringCellValue();
                 }
                 return cell.getStringCellValue();

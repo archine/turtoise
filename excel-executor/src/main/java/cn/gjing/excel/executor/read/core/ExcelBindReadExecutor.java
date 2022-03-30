@@ -88,7 +88,7 @@ class ExcelBindReadExecutor<R> extends ExcelBaseReadExecutor<R> {
                 Cell valueCell = row.getCell(c);
                 Object value;
                 if (valueCell != null) {
-                    value = super.getValue(r, valueCell, field, excelField.trim(), excelField.required(), RowType.BODY, ExecMode.BIND);
+                    value = super.getValue(r, valueCell, field, excelField.trim(), excelField.required(), RowType.BODY, ExecMode.BIND_READ);
                     if (!super.saveCurrentRowObj) {
                         break;
                     }

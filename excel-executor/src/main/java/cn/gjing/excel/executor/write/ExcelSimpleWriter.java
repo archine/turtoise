@@ -21,7 +21,7 @@ import java.util.List;
 public final class ExcelSimpleWriter extends ExcelBaseWriter {
 
     public ExcelSimpleWriter(ExcelWriterContext context, int windowSize, HttpServletResponse response) {
-        super(context, windowSize, response, ExecMode.SIMPLE);
+        super(context, windowSize, response, ExecMode.SIMPLE_WRITE);
     }
 
     /**

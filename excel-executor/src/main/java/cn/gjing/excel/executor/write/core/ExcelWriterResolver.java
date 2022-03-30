@@ -34,7 +34,7 @@ public abstract class ExcelWriterResolver {
 
     public ExcelWriterResolver(ExcelWriterContext context, ExecMode mode) {
         this.context = context;
-        if (mode == ExecMode.BIND) {
+        if (mode == ExecMode.BIND_WRITE) {
             this.writeExecutor = new ExcelBindWriterExecutor(context);
         } else {
             this.writeExecutor = new ExcelSimpleWriterExecutor(context);
