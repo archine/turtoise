@@ -5,24 +5,25 @@
     <parent>
         <artifactId>turtoise</artifactId>
         <groupId>cn.gjing</groupId>
-        <version>2022.1.2</version>
+        <version>2022.1.5</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>excel-temp-valid</artifactId>
-    <version>2022.1.0</version>
-    <description>Excel模板校验</description>
+    <version>2022.1.1</version>
+    <description>Excel template verification plug-in</description>
 
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.deploy.skip>true</maven.deploy.skip>
+
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>cn.gjing</groupId>
             <artifactId>excel-base</artifactId>
-            <version>2022.1.1</version>
+            <version>2022.1.2</version>
             <optional>true</optional>
         </dependency>
     </dependencies>

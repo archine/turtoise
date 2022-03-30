@@ -70,7 +70,7 @@ public final class BeanUtils {
                             .field(e)
                             .title(excelField.title())
                             .width(excelField.width())
-                            .order(excelField.order())
+                            .order(fieldProperties.size())
                             .format(excelField.format())
                             .color(excelField.color())
                             .fontColor(excelField.fontColor())

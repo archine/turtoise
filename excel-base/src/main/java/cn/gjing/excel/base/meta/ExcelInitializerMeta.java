@@ -1,9 +1,9 @@
 package cn.gjing.excel.base.meta;
 
+import cn.gjing.excel.base.annotation.Excel;
+import cn.gjing.excel.base.listener.ExcelInitializer;
 import cn.gjing.excel.base.listener.ExcelListener;
-import cn.gjing.excel.base.listener.ExcelListenerInitializer;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,20 +15,18 @@ public enum ExcelInitializerMeta {
     INSTANT;
 
     ExcelInitializerMeta() {
-        this.initializers = new ArrayList<>(5);
+
     }
 
-    private final List<ExcelListenerInitializer> initializers;
+    private ExcelInitializer excelInitializer;
 
     /**
-     * Add an initializer
+     * Set an initializer
      *
-     * @param listenerInitializer Excel listener initializer
-     * @return this
+     * @param initializer Excel initializer
      */
-    public ExcelInitializerMeta cache(ExcelListenerInitializer listenerInitializer) {
-        this.initializers.add(listenerInitializer);
-        return this;
+    public void cache(ExcelInitializer initializer) {
+        this.excelInitializer = initializer;
     }
 
     /**
@@ -39,9 +37,24 @@ public enum ExcelInitializerMeta {
      * @param execMode       Current execution mode
      * @param excelListeners excel listeners
      */
-    public void init(Class<?> excelEntity, ExecMode execMode,List<ExcelListener> excelListeners) {
-        for (ExcelListenerInitializer initializer : initializers) {
-            initializer.initListeners(excelEntity,execMode, excelListeners);
+    public void init(Class<?> excelEntity, ExecMode execMode, List<ExcelListener> excelListeners) {
+        if (this.excelInitializer == null) {
+            return;
         }
+        this.excelInitializer.initListeners(excelEntity, execMode, excelListeners);
+    }
+
+    /**
+     * Get the global Excel file version
+     *
+     * @param excelEntity Current Excel entity
+     * @param execMode    Current execution mode
+     * @return Returning NULL will be set according to {@link Excel#type()}
+     */
+    public ExcelType initType(Class<?> excelEntity, ExecMode execMode) {
+        if (this.excelInitializer == null) {
+            return null;
+        }
+        return this.excelInitializer.initExcelType(excelEntity, execMode);
     }
 }

@@ -5,7 +5,9 @@ import cn.gjing.excel.base.context.ExcelReaderContext;
 import cn.gjing.excel.base.context.ExcelWriterContext;
 import cn.gjing.excel.base.exception.ExcelException;
 import cn.gjing.excel.base.exception.ExcelTemplateException;
+import cn.gjing.excel.base.meta.ExcelInitializerMeta;
 import cn.gjing.excel.base.meta.ExcelType;
+import cn.gjing.excel.base.meta.ExecMode;
 import cn.gjing.excel.base.util.BeanUtils;
 import cn.gjing.excel.base.util.ExcelUtils;
 import cn.gjing.excel.executor.read.ExcelBindReader;
@@ -52,11 +54,11 @@ public final class ExcelFactory {
     /**
      * Create an Excel writer
      *
-     * @param fileName         Excel file name，The priority is higher than the annotation specification
-     * @param excelEntity      Excel entity
-     * @param response         response
-     * @param ignores          The name of the header to be ignored when exporting.
-     *                         If it is a parent, all children below it will be ignored as well
+     * @param fileName    Excel file name，The priority is higher than the annotation specification
+     * @param excelEntity Excel entity
+     * @param response    response
+     * @param ignores     The name of the header to be ignored when exporting.
+     *                    If it is a parent, all children below it will be ignored as well
      * @return ExcelWriter
      */
     public static ExcelBindWriter createWriter(String fileName, Class<?> excelEntity, HttpServletResponse response, String... ignores) {
@@ -66,7 +68,7 @@ public final class ExcelFactory {
         ExcelWriterContext context = new ExcelWriterContext();
         context.setExcelEntity(excelEntity);
         context.setFieldProperties(BeanUtils.getExcelFiledProperties(excelEntity, ignores));
-        context.setExcelType(excel.type());
+        context.setExcelType(ExcelInitializerMeta.INSTANT.initType(excelEntity, ExecMode.WRITE) == null ? excel.type() : ExcelInitializerMeta.INSTANT.initType(excelEntity, ExecMode.WRITE));
         context.setFileName(StringUtils.hasText(fileName) ? fileName : "".equals(excel.value()) ? LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : excel.value());
         context.setHeaderHeight(excel.headerHeight());
         context.setHeaderSeries(context.getFieldProperties().get(0).getValue().length);
@@ -78,8 +80,8 @@ public final class ExcelFactory {
     /**
      * Create an Excel simple writer
      *
-     * @param fileName         Excel file name
-     * @param response         response
+     * @param fileName Excel file name
+     * @param response response
      * @return ExcelSimpleWriter
      */
     public static ExcelSimpleWriter createSimpleWriter(String fileName, HttpServletResponse response) {
@@ -101,18 +103,18 @@ public final class ExcelFactory {
     /**
      * Create an Excel simple writer
      *
-     * @param fileName         Excel file name
-     * @param response         response
-     * @param excelType        Excel file type
-     * @param windowSize       Window size, which is flushed to disk when exported
-     *                         if the data that has been written out exceeds the specified size
-     *                         only for xlsx
+     * @param fileName   Excel file name
+     * @param response   response
+     * @param excelType  Excel file type
+     * @param windowSize Window size, which is flushed to disk when exported
+     *                   if the data that has been written out exceeds the specified size
+     *                   only for xlsx
      * @return ExcelSimpleWriter
      */
     public static ExcelSimpleWriter createSimpleWriter(String fileName, HttpServletResponse response, ExcelType excelType, int windowSize) {
         ExcelWriterContext context = new ExcelWriterContext();
         context.setFileName(StringUtils.hasText(fileName) ? fileName : LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        context.setExcelType(excelType);
+        context.setExcelType(ExcelInitializerMeta.INSTANT.initType(null, ExecMode.WRITE) == null ? excelType : ExcelInitializerMeta.INSTANT.initType(null, ExecMode.WRITE));
         context.setExcelEntity(Object.class);
         context.setBind(false);
         return new ExcelSimpleWriter(context, windowSize, response);
@@ -166,7 +168,7 @@ public final class ExcelFactory {
      * Create an Excel bind reader
      *
      * @param inputStream Excel file inputStream
-     * @param excelEntity  Excel entity
+     * @param excelEntity Excel entity
      * @param ignores     Ignore the array of actual Excel table headers that you read when importing
      * @param excelType   Excel file type
      * @param <R>         Entity type

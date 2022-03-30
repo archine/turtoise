@@ -25,10 +25,9 @@ public interface ExcelStyleWriteListener extends ExcelWriteListener {
      * @param row       Current row
      * @param cell      Current cell
      * @param dataIndex Data index, starts at 0
-     * @param colIndex  cell index
      * @param property  ExcelField property of current field
      */
-    void setHeadStyle(Row row, Cell cell, ExcelFieldProperty property, int dataIndex, int colIndex);
+    void setHeadStyle(Row row, Cell cell, ExcelFieldProperty property, int dataIndex);
 
     /**
      * Setting excel body cell styles is triggered when each body cell is successfully created
@@ -36,8 +35,7 @@ public interface ExcelStyleWriteListener extends ExcelWriteListener {
      * @param row       Current row
      * @param cell      Current cell
      * @param dataIndex Data index, starts at 0
-     * @param colIndex  cell index
      * @param property  ExcelField property of current field
      */
-    void setBodyStyle(Row row, Cell cell, ExcelFieldProperty property, int dataIndex, int colIndex);
+    void setBodyStyle(Row row, Cell cell, ExcelFieldProperty property, int dataIndex);
 }

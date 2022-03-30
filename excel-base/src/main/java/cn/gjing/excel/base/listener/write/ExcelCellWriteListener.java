@@ -16,30 +16,28 @@ public interface ExcelCellWriteListener extends ExcelWriteListener {
     /**
      * Triggered when the current cell has been written out and is about to start writing the next cell
      *
-     * @param sheet     Current sheet
-     * @param row       Current row
-     * @param cell      Current cell
-     * @param dataIndex Data indexing, depending on the row type, starts at 0
-     * @param colIndex  Current cell index
-     * @param rowType   Current row type
-     * @param property  excel filed property
+     * @param sheet         Current sheet
+     * @param row           Current row
+     * @param cell          Current cell
+     * @param dataIndex     Data indexing, depending on the row type, starts at 0
+     * @param rowType       Current row type
+     * @param property      excel filed property
      */
-    void completeCell(Sheet sheet, Row row, Cell cell, ExcelFieldProperty property, int dataIndex, int colIndex, RowType rowType);
+    void completeCell(Sheet sheet, Row row, Cell cell, ExcelFieldProperty property, int dataIndex, RowType rowType);
 
     /**
      * Triggered when the data converter finishes processing and is ready to write to the cell
      *
-     * @param sheet     Current sheet
-     * @param row       Current row
-     * @param cell      Current cell
-     * @param dataIndex Data indexing, depending on the row type, starts at 0
-     * @param colIndex  Current cell index
-     * @param rowType   Current row type
-     * @param property  ExcelField property
-     * @param value     Cell value
+     * @param sheet         Current sheet
+     * @param row           Current row
+     * @param cell          Current cell
+     * @param dataIndex     Data indexing, depending on the row type, starts at 0
+     * @param rowType       Current row type
+     * @param property      Excel field property
+     * @param value         Cell value
      * @return Cell value, if null, no assignment will take place
      */
-    default Object assignmentBefore(Sheet sheet, Row row, Cell cell, ExcelFieldProperty property, int dataIndex, int colIndex, RowType rowType, Object value) {
+    default Object assignmentBefore(Sheet sheet, Row row, Cell cell, ExcelFieldProperty property, int dataIndex, RowType rowType, Object value) {
         return value;
     }
 }

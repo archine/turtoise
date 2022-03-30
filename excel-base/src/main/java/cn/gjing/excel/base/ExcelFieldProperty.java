@@ -40,7 +40,8 @@ public class ExcelFieldProperty {
     private int width = 5120;
 
     /**
-     * Header serial number
+     * Excel header actual sequence number, starting from 0,
+     * is written by the executor according to the sequence number
      */
     @Builder.Default
     private int order = 0;

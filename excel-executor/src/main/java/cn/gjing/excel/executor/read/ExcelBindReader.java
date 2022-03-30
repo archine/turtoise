@@ -1,6 +1,7 @@
 package cn.gjing.excel.executor.read;
 
 import cn.gjing.excel.base.context.ExcelReaderContext;
+import cn.gjing.excel.base.exception.ExcelException;
 import cn.gjing.excel.base.exception.ExcelTemplateException;
 import cn.gjing.excel.base.listener.read.ExcelReadListener;
 import cn.gjing.excel.base.listener.read.ExcelResultReadListener;
@@ -104,7 +105,7 @@ public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
      **/
     public ExcelBindReader<R> check(String key) {
         if (!StringUtils.hasText(key)) {
-            throw new IllegalArgumentException("Unique key cannot be empty");
+            throw new ExcelException("Unique key cannot be empty");
         }
         super.context.setCheckTemplate(true);
         super.context.setUniqueKey(key);

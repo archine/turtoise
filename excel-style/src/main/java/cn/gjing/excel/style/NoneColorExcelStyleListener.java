@@ -74,18 +74,19 @@ public final class NoneColorExcelStyleListener implements ExcelStyleWriteListene
     }
 
     @Override
-    public void setHeadStyle(Row row, Cell cell, ExcelFieldProperty property, int dataIndex, int colIndex) {
+    public void setHeadStyle(Row row, Cell cell, ExcelFieldProperty property, int dataIndex) {
         if (dataIndex == 0) {
-            StyleUtils.setColumnWidth(property, colIndex, this.writerContext);
+            int columnIndex = cell.getColumnIndex();
+            StyleUtils.setColumnWidth(property, columnIndex, this.writerContext);
             if (this.writerContext.isTemplate()) {
-                this.writerContext.getSheet().setDefaultColumnStyle(colIndex, StyleUtils.createCacheStyle(property, this.bodyStyles, this.writerContext));
+                this.writerContext.getSheet().setDefaultColumnStyle(columnIndex, StyleUtils.createCacheStyle(property, this.bodyStyles, this.writerContext));
             }
         }
         cell.setCellStyle(this.cellStyle);
     }
 
     @Override
-    public void setBodyStyle(Row row, Cell cell, ExcelFieldProperty property, int dataIndex, int colIndex) {
+    public void setBodyStyle(Row row, Cell cell, ExcelFieldProperty property, int dataIndex) {
         cell.setCellStyle(StyleUtils.createCacheStyle(property, this.bodyStyles, this.writerContext));
     }
 }

@@ -29,15 +29,14 @@ public final class ListenerChain {
      * @param row       Current row
      * @param cell      Current cell
      * @param index     Data indexing, depending on the row type, starts at 0
-     * @param colIndex  Current cell index
      * @param rowType   Current row type
      * @param property  ExcelField property
      */
-    public static void doCompleteCell(List<ExcelListener> listeners, Sheet sheet, Row row, Cell cell, ExcelFieldProperty property, int index, int colIndex, RowType rowType) {
+    public static void doCompleteCell(List<ExcelListener> listeners, Sheet sheet, Row row, Cell cell, ExcelFieldProperty property, int index, RowType rowType) {
         if (listeners != null) {
             for (ExcelListener cellListener : listeners) {
                 if (cellListener instanceof ExcelCellWriteListener) {
-                    ((ExcelCellWriteListener) cellListener).completeCell(sheet, row, cell, property, index, colIndex, rowType);
+                    ((ExcelCellWriteListener) cellListener).completeCell(sheet, row, cell, property, index, rowType);
                 }
             }
         }
@@ -51,18 +50,17 @@ public final class ListenerChain {
      * @param row       Current row
      * @param cell      Current cell
      * @param index     Data indexing, depending on the row type, starts at 0
-     * @param colIndex  Current cell index
      * @param rowType   Current row type
      * @param property  ExcelField property
      * @param value     Cell value
      * @return Cell value
      */
-    public static Object doAssignmentBefore(List<ExcelListener> listeners, Sheet sheet, Row row, Cell cell, ExcelFieldProperty property, int index, int colIndex, RowType rowType, Object value) {
+    public static Object doAssignmentBefore(List<ExcelListener> listeners, Sheet sheet, Row row, Cell cell, ExcelFieldProperty property, int index, RowType rowType, Object value) {
         Object val = value;
         if (listeners != null) {
             for (ExcelListener cellListener : listeners) {
                 if (cellListener instanceof ExcelCellWriteListener) {
-                    val = ((ExcelCellWriteListener) cellListener).assignmentBefore(sheet, row, cell, property, index, colIndex, rowType, val);
+                    val = ((ExcelCellWriteListener) cellListener).assignmentBefore(sheet, row, cell, property, index, rowType, val);
                 }
             }
         }
@@ -165,15 +163,14 @@ public final class ListenerChain {
      * @param row            Current row
      * @param cell           Current cell
      * @param index          Line index, index type according to isHead
-     * @param colIndex       cell index
      * @param property       ExcelField property
      * @param styleListeners Style listeners
      */
-    public static void doSetHeadStyle(List<ExcelListener> styleListeners, Row row, Cell cell, ExcelFieldProperty property, int index, int colIndex) {
+    public static void doSetHeadStyle(List<ExcelListener> styleListeners, Row row, Cell cell, ExcelFieldProperty property, int index) {
         if (styleListeners != null) {
             for (ExcelListener styleListener : styleListeners) {
                 if (styleListener instanceof ExcelStyleWriteListener) {
-                    ((ExcelStyleWriteListener) styleListener).setHeadStyle(row, cell, property, index, colIndex);
+                    ((ExcelStyleWriteListener) styleListener).setHeadStyle(row, cell, property, index);
                 }
             }
         }
@@ -185,15 +182,14 @@ public final class ListenerChain {
      * @param row            Current row
      * @param cell           Current cell
      * @param index          Line index, index type according to isHead
-     * @param colIndex       cell index
      * @param property       ExcelField property
      * @param styleListeners Style listeners
      */
-    public static void doSetBodyStyle(List<ExcelListener> styleListeners, Row row, Cell cell, ExcelFieldProperty property, int index, int colIndex) {
+    public static void doSetBodyStyle(List<ExcelListener> styleListeners, Row row, Cell cell, ExcelFieldProperty property, int index) {
         if (styleListeners != null) {
             for (ExcelListener styleListener : styleListeners) {
                 if (styleListener instanceof ExcelStyleWriteListener) {
-                    ((ExcelStyleWriteListener) styleListener).setBodyStyle(row, cell, property, index, colIndex);
+                    ((ExcelStyleWriteListener) styleListener).setBodyStyle(row, cell, property, index);
                 }
             }
         }

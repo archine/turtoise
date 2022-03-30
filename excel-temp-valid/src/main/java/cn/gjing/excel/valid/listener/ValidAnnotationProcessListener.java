@@ -32,7 +32,7 @@ public class ValidAnnotationProcessListener implements ExcelCellWriteListener, E
      * You can set the options of the drop-down box by using the method,
      * which is used when the drop-down box has too many options
      *
-     * @param boxValues drop-down box or cascade box options
+     * @param boxValues drop-down box options
      */
     public ValidAnnotationProcessListener(Map<String, String[]> boxValues) {
         this.boxValues = boxValues;
@@ -43,7 +43,7 @@ public class ValidAnnotationProcessListener implements ExcelCellWriteListener, E
      * You can set the options of the drop-down box by using the method,
      * which is used when the drop-down box has too many options or cascading
      *
-     * @param boxValues drop-down box or cascade box options
+     * @param boxValues     drop-down box options
      * @param cascadeValues Cascade drop-down box values
      */
     public ValidAnnotationProcessListener(Map<String, String[]> boxValues, Map<String, String[]> cascadeValues) {
@@ -57,10 +57,10 @@ public class ValidAnnotationProcessListener implements ExcelCellWriteListener, E
     }
 
     @Override
-    public void completeCell(Sheet sheet, Row row, Cell cell, ExcelFieldProperty property, int dataIndex, int colIndex, RowType rowType) {
+    public void completeCell(Sheet sheet, Row row, Cell cell, ExcelFieldProperty property, int dataIndex, RowType rowType) {
         if (rowType == RowType.HEAD) {
             if (dataIndex + 1 == this.context.getHeaderSeries()) {
-                HandleMeta.INSTANCE.exec(property.getField(), this.context, row, colIndex, this.boxValues,this.cascadeValues);
+                HandleMeta.INSTANCE.exec(property.getField(), this.context, row, cell.getColumnIndex(), this.boxValues, this.cascadeValues);
             }
         }
     }

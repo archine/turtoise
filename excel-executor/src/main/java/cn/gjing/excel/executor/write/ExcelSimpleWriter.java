@@ -3,6 +3,7 @@ package cn.gjing.excel.executor.write;
 import cn.gjing.excel.base.BigTitle;
 import cn.gjing.excel.base.ExcelFieldProperty;
 import cn.gjing.excel.base.context.ExcelWriterContext;
+import cn.gjing.excel.base.exception.ExcelException;
 import cn.gjing.excel.base.listener.write.ExcelWriteListener;
 import cn.gjing.excel.base.meta.ExecMode;
 import cn.gjing.excel.executor.read.ExcelBindReader;
@@ -196,7 +197,7 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      */
     public ExcelSimpleWriter bind(String key) {
         if (!StringUtils.hasText(key)) {
-            throw new IllegalArgumentException("Unique key cannot be empty");
+            throw new ExcelException("Unique key cannot be empty");
         }
         super.context.setUniqueKey(key);
         super.context.setBind(true);
