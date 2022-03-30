@@ -39,6 +39,7 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
             for (String[] headName : headNames) {
                 properties.add(ExcelFieldProperty.builder()
                         .value(headName)
+                        .order(properties.size())
                         .build());
             }
             super.context.setFieldProperties(properties);

@@ -5,6 +5,7 @@ import cn.gjing.excel.base.aware.ExcelWriteContextAware;
 import cn.gjing.excel.base.context.ExcelWriterContext;
 import cn.gjing.excel.base.listener.write.ExcelWriteListener;
 import cn.gjing.excel.base.meta.ExcelInitializerMeta;
+import cn.gjing.excel.base.meta.ExcelType;
 import cn.gjing.excel.base.meta.ExecMode;
 import cn.gjing.excel.base.util.ListenerChain;
 import cn.gjing.excel.base.util.ParamUtils;
@@ -35,7 +36,10 @@ public abstract class ExcelBaseWriter {
         this.context = context;
         this.chooseResolver(context, windowSize, mode);
         ExcelInitializerMeta.INSTANT.initListener(context.getExcelEntity(), mode, context.getListenerCache());
-        context.setExcelType(ExcelInitializerMeta.INSTANT.initType(context.getExcelEntity(), mode));
+        ExcelType globalType = ExcelInitializerMeta.INSTANT.initType(context.getExcelEntity(), mode);
+        if (globalType != null) {
+            context.setExcelType(globalType);
+        }
         context.getListenerCache().forEach(e -> this.initAware((ExcelWriteListener) e));
     }
 

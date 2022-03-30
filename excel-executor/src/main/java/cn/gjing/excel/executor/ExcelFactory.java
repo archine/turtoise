@@ -65,6 +65,7 @@ public final class ExcelFactory {
         Objects.requireNonNull(excel, "@Excel annotation was not found on the " + excelEntity);
         ExcelWriterContext context = new ExcelWriterContext();
         context.setExcelEntity(excelEntity);
+        context.setExcelType(excel.type());
         context.setFieldProperties(BeanUtils.getExcelFiledProperties(excelEntity, ignores));
         context.setFileName(StringUtils.hasText(fileName) ? fileName : "".equals(excel.value()) ? LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : excel.value());
         context.setHeaderHeight(excel.headerHeight());
@@ -112,6 +113,7 @@ public final class ExcelFactory {
         ExcelWriterContext context = new ExcelWriterContext();
         context.setFileName(StringUtils.hasText(fileName) ? fileName : LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         context.setExcelEntity(null);
+        context.setExcelType(excelType);
         context.setBind(false);
         return new ExcelSimpleWriter(context, windowSize, response);
     }
