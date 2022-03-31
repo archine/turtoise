@@ -10,18 +10,13 @@ import cn.gjing.excel.base.util.ListenerChain;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Excel writer resolver
@@ -87,7 +82,7 @@ public abstract class ExcelWriterResolver {
     /**
      * Write excel header
      *
-     * @param needHead  Is needHead excel entity or sheet?
+     * @param needHead Is needHead excel entity or sheet?
      * @return this
      */
     public abstract ExcelWriterResolver writeHead(boolean needHead);
@@ -100,15 +95,17 @@ public abstract class ExcelWriterResolver {
      */
     public void flush(HttpServletResponse response, ExcelWriterContext context) {
         response.setContentType("application/vnd.ms-excel");
-        HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
+        String fileName = context.getFileName() + (context.getExcelType() == ExcelType.XLS ? ".xls" : ".xlsx");
         OutputStream outputStream = null;
         try {
-            if (request.getHeader("User-Agent").toLowerCase().indexOf("firefox") > 0) {
-                context.setFileName(new String(context.getFileName().getBytes(StandardCharsets.UTF_8), "ISO8859-1"));
-            } else {
-                context.setFileName(URLEncoder.encode(context.getFileName(), "UTF-8"));
-            }
-            response.setHeader("Content-disposition", "attachment;filename=" + context.getFileName() + (context.getExcelType() == ExcelType.XLS ? ".xls" : ".xlsx"));
+            String encodeFileName = URLEncoder.encode(fileName, "utf-8").replaceAll("\\+", "%20");
+            String dispositionVal = "attachment; filename=" +
+                    encodeFileName +
+                    ";" +
+                    "filename*=" +
+                    "utf-8''" +
+                    encodeFileName;
+            response.setHeader("Content-disposition", dispositionVal);
             outputStream = response.getOutputStream();
             context.getWorkbook().write(outputStream);
         } catch (IOException e) {
