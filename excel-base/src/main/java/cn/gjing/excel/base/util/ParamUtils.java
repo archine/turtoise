@@ -2,8 +2,6 @@ package cn.gjing.excel.base.util;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * Param utils
@@ -65,10 +63,9 @@ public final class ParamUtils {
      *
      * @param param1     param1
      * @param param2     param2
-     * @param allowEmpty Whether allow empty？
      * @return boolean
      */
-    public static boolean equals(Object param1, Object param2, boolean allowEmpty) {
+    public static boolean equals(Object param1, Object param2) {
         return param1 == param2 || param1.equals(param2);
     }
 
@@ -92,22 +89,5 @@ public final class ParamUtils {
             prefix = (char) (prefix + (number - 25) / 26);
         }
         return "" + prefix + suffix;
-    }
-
-    /**
-     * Delete specified key on HashMap
-     *
-     * @param map HashMap
-     * @param key Specified key
-     */
-    public static void deleteMapKey(Map<?, ?> map, Object key) {
-        Iterator<? extends Map.Entry<?, ?>> iterator = map.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<?, ?> entry = iterator.next();
-            if (entry.getKey() == key || entry.getKey().equals(key)) {
-                iterator.remove();
-                break;
-            }
-        }
     }
 }

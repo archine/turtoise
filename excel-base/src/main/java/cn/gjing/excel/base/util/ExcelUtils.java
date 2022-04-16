@@ -82,7 +82,7 @@ public final class ExcelUtils {
      * @param LastRow  Last row index
      */
     public static void merge(Sheet sheet, int firstCol, int lastCol, int firstRow, int LastRow) {
-        sheet.addMergedRegion(new CellRangeAddress(firstRow, LastRow, firstCol, lastCol));
+        sheet.addMergedRegionUnsafe(new CellRangeAddress(firstRow, LastRow, firstCol, lastCol));
     }
 
     /**

@@ -144,7 +144,7 @@ public final class ListenerChain {
      * Set excel big title style
      *
      * @param cell           Current cell
-     * @param bigTitle       Bit title
+     * @param bigTitle       Big title
      * @param styleListeners Style listeners
      */
     public static void doSetTitleStyle(List<ExcelListener> styleListeners, BigTitle bigTitle, Cell cell) {

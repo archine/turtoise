@@ -59,6 +59,7 @@ public final class ExcelWriterContext extends AbstractExcelContext {
     /**
      * Whether the current export is a template
      */
+    @Deprecated
     private boolean isTemplate;
 
     /**

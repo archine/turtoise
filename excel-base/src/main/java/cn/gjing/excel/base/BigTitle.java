@@ -5,7 +5,7 @@ import lombok.*;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 
 /**
- * Excel big title,use to merge multi-row, multi-column cells and fill in the contents
+ * Excel big title, used to insert a blank line that can fill the content you want
  *
  * @author Gjing
  **/
