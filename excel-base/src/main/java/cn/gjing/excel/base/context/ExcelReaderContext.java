@@ -40,7 +40,7 @@ public class ExcelReaderContext<R> extends AbstractExcelContext {
     /**
      * Read rows before the header
      */
-    private boolean headBefore = false;
+    private boolean readOther = false;
 
     /**
      * The unique key
@@ -68,6 +68,6 @@ public class ExcelReaderContext<R> extends AbstractExcelContext {
         this.headNames = new ArrayList<>();
         this.ignores = ignores;
         this.checkTemplate = false;
-        this.headBefore = false;
+        this.readOther = false;
     }
 }

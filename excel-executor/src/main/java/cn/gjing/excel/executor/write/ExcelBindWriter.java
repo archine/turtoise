@@ -8,7 +8,7 @@ import cn.gjing.excel.base.listener.ExcelListener;
 import cn.gjing.excel.base.listener.write.ExcelWriteListener;
 import cn.gjing.excel.base.meta.ExcelInitializerMeta;
 import cn.gjing.excel.base.meta.ExecMode;
-import cn.gjing.excel.base.util.BeanUtils;
+import cn.gjing.excel.executor.util.BeanUtils;
 import cn.gjing.excel.executor.read.ExcelBindReader;
 import org.springframework.util.StringUtils;
 
@@ -71,11 +71,11 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
      */
     public ExcelBindWriter write(List<?> data, String sheetName, boolean needHead) {
         super.createSheet(sheetName);
-        if (data == null) {
-            super.context.setTemplate(true);
-            this.writerResolver.writeHead(needHead);
-        } else {
-            this.writerResolver.writeHead(needHead).write(data);
+        if (needHead) {
+            super.writeExecutor.writeHead();
+        }
+        if (data != null && !data.isEmpty()) {
+            super.writeExecutor.writeBody(data);
         }
         return this;
     }
@@ -100,7 +100,7 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
     public ExcelBindWriter writeTitle(BigTitle bigTitle, String sheetName) {
         if (bigTitle != null) {
             super.createSheet(sheetName);
-            super.writerResolver.writeTitle(bigTitle);
+            super.writeExecutor.writeTitle(bigTitle);
         }
         return this;
     }
@@ -199,6 +199,20 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
         if (listeners != null) {
             listeners.forEach(this::listener);
         }
+        return this;
+    }
+
+    /**
+     * Set the current write position
+     *
+     * @param startCol col index, based on 0
+     * @return this
+     */
+    public ExcelBindWriter withPosition(int startCol) {
+        if (startCol < 0) {
+            throw new ExcelException("write a column index that cannot be less than 0");
+        }
+        super.writeExecutor.setPosition(startCol);
         return this;
     }
 }

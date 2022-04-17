@@ -7,7 +7,6 @@ import cn.gjing.excel.base.listener.read.ExcelReadListener;
 import cn.gjing.excel.base.listener.read.ExcelResultReadListener;
 import cn.gjing.excel.base.meta.ExcelType;
 import cn.gjing.excel.base.meta.ExecMode;
-import cn.gjing.excel.executor.read.core.ExcelBaseReader;
 import org.springframework.util.StringUtils;
 
 import java.io.InputStream;
@@ -80,8 +79,8 @@ public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
      * @param need Need
      * @return this
      */
-    public ExcelBindReader<R> headBefore(boolean need) {
-        super.context.setHeadBefore(need);
+    public ExcelBindReader<R> readOther(boolean need) {
+        super.context.setReadOther(need);
         return this;
     }
 
@@ -145,6 +144,20 @@ public final class ExcelBindReader<R> extends ExcelBaseReader<R> {
      */
     public ExcelBindReader<R> subscribe(ExcelResultReadListener<R> excelResultReadListener) {
         super.context.setResultReadListener(excelResultReadListener);
+        return this;
+    }
+
+    /**
+     * Set the current write position
+     *
+     * @param startCol col index, based on 0
+     * @return this
+     */
+    public ExcelBindReader<R> withPosition(int startCol) {
+        if (startCol < 0) {
+            throw new ExcelException("the column index to start reading cannot be less than 0");
+        }
+        super.baseReadExecutor.setPosition(startCol);
         return this;
     }
 }

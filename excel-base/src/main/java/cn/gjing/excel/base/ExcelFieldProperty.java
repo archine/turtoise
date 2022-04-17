@@ -28,21 +28,14 @@ public class ExcelFieldProperty {
     private String[] value = new String[0];
 
     /**
-     * Excel header column
-     */
-    @Builder.Default
-    private String title = "";
-
-    /**
      * Column width of the Excel header
      */
     @Builder.Default
     private int width = 5120;
 
     /**
-     * Excel header actual sequence number, starting from 0,
-     * is written by the executor according to the sequence number
-     */
+     * Excel header actual sequence number, based on 0
+     **/
     @Builder.Default
     private int order = 0;
 

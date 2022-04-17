@@ -1,4 +1,4 @@
-package cn.gjing.excel.base.util;
+package cn.gjing.excel.executor.util;
 
 import com.google.gson.Gson;
 

@@ -5,11 +5,11 @@
     <parent>
         <artifactId>turtoise</artifactId>
         <groupId>cn.gjing</groupId>
-        <version>2022.1.9</version>
+        <version>2022.2.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>excel-base</artifactId>
-    <version>2022.1.4</version>
+    <version>2022.1.5</version>
     <description>Excel基础包,包含注解、监听器等</description>
 
     <properties>

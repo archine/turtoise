@@ -6,7 +6,7 @@ import cn.gjing.excel.base.exception.ExcelTemplateException;
 import cn.gjing.excel.base.listener.ExcelListener;
 import cn.gjing.excel.base.meta.ExecMode;
 import cn.gjing.excel.base.meta.RowType;
-import cn.gjing.excel.base.util.JsonUtils;
+import cn.gjing.excel.executor.util.JsonUtils;
 import cn.gjing.excel.base.util.ListenerChain;
 import cn.gjing.excel.base.util.ParamUtils;
 import com.monitorjbl.xlsx.impl.StreamingWorkbook;
@@ -26,9 +26,19 @@ import java.util.List;
 public abstract class ExcelBaseReadExecutor<R> {
     protected final ExcelReaderContext<R> context;
     protected boolean saveCurrentRowObj;
+    protected int startCol;
 
     public ExcelBaseReadExecutor(ExcelReaderContext<R> context) {
         this.context = context;
+    }
+
+    /**
+     * Sets the location where data is to be written
+     *
+     * @param startCol column index
+     */
+    public void setPosition(int startCol) {
+        this.startCol = startCol;
     }
 
     /**
@@ -46,8 +56,11 @@ public abstract class ExcelBaseReadExecutor<R> {
      * @param row              Current row
      * @return Continue read next row
      */
-    protected boolean readHead(List<ExcelListener> rowReadListeners, Row row) {
+    protected boolean readHeader(List<ExcelListener> rowReadListeners, Row row) {
         for (Cell cell : row) {
+            if (cell.getColumnIndex() < this.startCol) {
+                continue;
+            }
             String value = cell.getStringCellValue();
             if (ParamUtils.contains(this.context.getIgnores(), value)) {
                 value = "ignored";
@@ -64,8 +77,8 @@ public abstract class ExcelBaseReadExecutor<R> {
      * @param row              Current row
      * @return Continue read next row
      */
-    protected boolean readHeadBefore(List<ExcelListener> rowReadListeners, Row row) {
-        if (this.context.isHeadBefore()) {
+    protected boolean readOther(List<ExcelListener> rowReadListeners, Row row) {
+        if (this.context.isReadOther()) {
             for (Cell cell : row) {
                 Object value = this.getValue(null, cell, null, false, false, RowType.OTHER, ExecMode.SIMPLE_READ);
                 ListenerChain.doReadCell(rowReadListeners, value, cell, row.getRowNum(), cell.getColumnIndex(), RowType.OTHER);
@@ -103,7 +116,7 @@ public abstract class ExcelBaseReadExecutor<R> {
                 throw new ExcelTemplateException();
             }
             for (Row row : this.context.getWorkbook().getSheet(key)) {
-                if (!ParamUtils.equals(ParamUtils.encodeMd5(this.context.getUniqueKey()), row.getCell(0).getStringCellValue(), false)) {
+                if (!ParamUtils.equals(ParamUtils.encodeMd5(this.context.getUniqueKey()), row.getCell(0).getStringCellValue())) {
                     throw new ExcelTemplateException();
                 }
                 break;

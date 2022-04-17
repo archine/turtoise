@@ -1,7 +1,8 @@
-package cn.gjing.excel.base.util;
+package cn.gjing.excel.executor.util;
 
 import cn.gjing.excel.base.ExcelFieldProperty;
 import cn.gjing.excel.base.annotation.ExcelField;
+import cn.gjing.excel.base.util.ParamUtils;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -68,7 +69,6 @@ public final class BeanUtils {
                     fieldProperties.add(ExcelFieldProperty.builder()
                             .value(excelField.value())
                             .field(e)
-                            .title(excelField.title())
                             .width(excelField.width())
                             .order(fieldProperties.size())
                             .format(excelField.format())

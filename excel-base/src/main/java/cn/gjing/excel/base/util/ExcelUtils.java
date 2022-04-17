@@ -13,7 +13,6 @@ import java.util.Date;
  * @author Gjing
  **/
 public final class ExcelUtils {
-
     /**
      * Set cell value
      *
@@ -46,6 +45,10 @@ public final class ExcelUtils {
         }
         if (value instanceof LocalDate) {
             cell.setCellValue((LocalDate) value);
+            return;
+        }
+        if (value instanceof RichTextString) {
+            cell.setCellValue((RichTextString) value);
             return;
         }
         throw new IllegalArgumentException("Unsupported data type, you can use a data converter " + value);
@@ -137,17 +140,6 @@ public final class ExcelUtils {
      */
     public static Font createFont(Workbook workbook) {
         return workbook.createFont();
-    }
-
-    /**
-     * Create rich text string
-     *
-     * @param workbook workbook
-     * @param content  Rich text content
-     * @return RichTextString
-     */
-    public static RichTextString createRichText(Workbook workbook, String content) {
-        return workbook.getCreationHelper().createRichTextString(content);
     }
 
     /**

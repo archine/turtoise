@@ -15,27 +15,25 @@ import java.util.List;
  *
  * @author Gjing
  **/
-class ExcelSimpleWriterExecutor extends ExcelBaseWriteExecutor {
+public class ExcelSimpleWriterExecutor extends ExcelBaseWriteExecutor {
     public ExcelSimpleWriterExecutor(ExcelWriterContext context) {
         super(context);
     }
 
     @Override
-    public void writeHead(boolean needHead) {
-        if (!needHead) {
-            return;
-        }
+    public void writeHead() {
         Row headRow;
         for (int index = 0; index < this.context.getHeaderSeries(); index++) {
             ListenerChain.doCreateRowBefore(this.context.getListenerCache(), this.context.getSheet(), index, RowType.HEAD);
-            headRow = this.context.getSheet().createRow(this.context.getSheet().getPhysicalNumberOfRows());
+            headRow = this.context.getSheet().createRow(this.context.getSheet().getLastRowNum() + 1);
             if (this.context.getHeaderHeight() > 0) {
                 headRow.setHeight(this.context.getHeaderHeight());
             }
-            for (int colIndex = 0, headSize = this.context.getFieldProperties().size(); colIndex < headSize; colIndex++) {
-                String headName = this.context.getFieldProperties().get(colIndex).getValue()[index];
-                ExcelFieldProperty property = this.context.getFieldProperties().get(colIndex);
-                Cell headCell = headRow.createCell(headRow.getPhysicalNumberOfCells());
+            for (int headerIndex = 0, headSize = this.context.getFieldProperties().size(); headerIndex < headSize; headerIndex++) {
+                String headName = this.context.getFieldProperties().get(headerIndex).getValue()[index];
+                ExcelFieldProperty property = this.context.getFieldProperties().get(headerIndex);
+                short lastCellNum = headRow.getLastCellNum();
+                Cell headCell = headRow.createCell(lastCellNum == -1 ? super.startCol : lastCellNum);
                 ListenerChain.doSetHeadStyle(this.context.getListenerCache(), headRow, headCell, property, index);
                 headName = (String) ListenerChain.doAssignmentBefore(this.context.getListenerCache(), this.context.getSheet(),
                         headRow, headCell, property, index, RowType.HEAD, headName);
@@ -54,14 +52,15 @@ class ExcelSimpleWriterExecutor extends ExcelBaseWriteExecutor {
         for (int index = 0, dataSize = data.size(); index < dataSize; index++) {
             List<?> o = data2.get(index);
             ListenerChain.doCreateRowBefore(this.context.getListenerCache(), this.context.getSheet(), index, RowType.BODY);
-            Row valueRow = this.context.getSheet().createRow(this.context.getSheet().getPhysicalNumberOfRows());
+            Row valueRow = this.context.getSheet().createRow(this.context.getSheet().getLastRowNum() + 1);
             if (this.context.getBodyHeight() > 0) {
                 valueRow.setHeight(this.context.getBodyHeight());
             }
-            for (int colIndex = 0, headSize = this.context.getFieldProperties().size(); colIndex < headSize; colIndex++) {
-                Object value = o.get(colIndex);
-                ExcelFieldProperty property = this.context.getFieldProperties().get(colIndex);
-                Cell valueCell = valueRow.createCell(valueRow.getPhysicalNumberOfCells());
+            for (int headerIndex = 0, headSize = this.context.getFieldProperties().size(); headerIndex < headSize; headerIndex++) {
+                Object value = o.get(headerIndex);
+                ExcelFieldProperty property = this.context.getFieldProperties().get(headerIndex);
+                short lastCellNum = valueRow.getLastCellNum();
+                Cell valueCell = valueRow.createCell(lastCellNum == -1 ? super.startCol : lastCellNum);
                 ListenerChain.doSetBodyStyle(this.context.getListenerCache(), valueRow, valueCell, property, index);
                 value = ListenerChain.doAssignmentBefore(this.context.getListenerCache(), this.context.getSheet(), valueRow, valueCell,
                         property, index, RowType.BODY, value);

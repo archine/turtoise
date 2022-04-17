@@ -6,7 +6,7 @@ import cn.gjing.excel.base.context.ExcelWriterContext;
 import cn.gjing.excel.base.exception.ExcelException;
 import cn.gjing.excel.base.exception.ExcelTemplateException;
 import cn.gjing.excel.base.meta.ExcelType;
-import cn.gjing.excel.base.util.BeanUtils;
+import cn.gjing.excel.executor.util.BeanUtils;
 import cn.gjing.excel.base.util.ExcelUtils;
 import cn.gjing.excel.executor.read.ExcelBindReader;
 import cn.gjing.excel.executor.read.ExcelSimpleReader;
@@ -17,9 +17,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
@@ -156,7 +156,7 @@ public final class ExcelFactory {
             if (excelType == null) {
                 throw new ExcelTemplateException("File type does not belong to Excel");
             }
-            return createReader(new FileInputStream(file), excelClass, excelType, ignores);
+            return createReader(Files.newInputStream(file.toPath()), excelClass, excelType, ignores);
         } catch (IOException e) {
             throw new ExcelException("Create excel reader error," + e.getMessage());
         }
@@ -197,7 +197,7 @@ public final class ExcelFactory {
             if (excelType == null) {
                 throw new ExcelTemplateException("File type does not belong to Excel");
             }
-            return createSimpleReader(new FileInputStream(file), excelType, cacheRow, bufferSize, ignores);
+            return createSimpleReader(Files.newInputStream(file.toPath()), excelType, cacheRow, bufferSize, ignores);
         } catch (IOException e) {
             throw new ExcelException("Create excel reader error," + e.getMessage());
         }
@@ -217,7 +217,7 @@ public final class ExcelFactory {
             if (excelType == null) {
                 throw new ExcelTemplateException("File type does not belong to Excel");
             }
-            return createSimpleReader(new FileInputStream(file), excelType, 100, 2048, ignores);
+            return createSimpleReader(Files.newInputStream(file.toPath()), excelType, 100, 2048, ignores);
         } catch (IOException e) {
             throw new ExcelException("Create excel reader error," + e.getMessage());
         }

@@ -12,7 +12,7 @@ import org.apache.poi.ss.usermodel.Row;
  *
  * @author Gjing
  **/
-class ExcelSimpleReadExecutor<R> extends ExcelBaseReadExecutor<R> {
+public class ExcelSimpleReadExecutor<R> extends ExcelBaseReadExecutor<R> {
     public ExcelSimpleReadExecutor(ExcelReaderContext<R> context) {
         super(context);
     }
@@ -28,11 +28,11 @@ class ExcelSimpleReadExecutor<R> extends ExcelBaseReadExecutor<R> {
                 break;
             }
             if (row.getRowNum() < headerIndex) {
-                continueRead = super.readHeadBefore(super.context.getListenerCache(), row);
+                continueRead = super.readOther(super.context.getListenerCache(), row);
                 continue;
             }
             if (row.getRowNum() == headerIndex) {
-                continueRead = super.readHead(super.context.getListenerCache(), row);
+                continueRead = super.readHeader(super.context.getListenerCache(), row);
                 continue;
             }
             for (int i = 0, size = super.context.getHeadNames().size(); i < size; i++) {
@@ -40,7 +40,7 @@ class ExcelSimpleReadExecutor<R> extends ExcelBaseReadExecutor<R> {
                 if ("ignored".equals(head)) {
                     continue;
                 }
-                Cell cell = row.getCell(i);
+                Cell cell = row.getCell(i + super.startCol);
                 Object value;
                 if (cell != null) {
                     value = this.getValue(null, cell, null, false, false, RowType.BODY, ExecMode.SIMPLE_READ);

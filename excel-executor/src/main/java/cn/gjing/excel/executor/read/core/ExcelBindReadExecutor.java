@@ -10,7 +10,7 @@ import cn.gjing.excel.base.listener.ExcelListener;
 import cn.gjing.excel.base.meta.ELMeta;
 import cn.gjing.excel.base.meta.ExecMode;
 import cn.gjing.excel.base.meta.RowType;
-import cn.gjing.excel.base.util.BeanUtils;
+import cn.gjing.excel.executor.util.BeanUtils;
 import cn.gjing.excel.base.util.ListenerChain;
 import cn.gjing.excel.base.util.ParamUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -30,7 +30,7 @@ import java.util.List;
  * Excel bind mode import executor
  * @author Gjing
  **/
-class ExcelBindReadExecutor<R> extends ExcelBaseReadExecutor<R> {
+public class ExcelBindReadExecutor<R> extends ExcelBaseReadExecutor<R> {
 
     public ExcelBindReadExecutor(ExcelReaderContext<R> context) {
         super(context);
@@ -58,11 +58,11 @@ class ExcelBindReadExecutor<R> extends ExcelBaseReadExecutor<R> {
                 break;
             }
             if (row.getRowNum() < headerIndex) {
-                continueRead = super.readHeadBefore(rowReadListeners, row);
+                continueRead = super.readOther(rowReadListeners, row);
                 continue;
             }
             if (row.getRowNum() == headerIndex) {
-                continueRead = super.readHead(rowReadListeners, row);
+                continueRead = super.readHeader(rowReadListeners, row);
                 continue;
             }
             super.saveCurrentRowObj = true;
@@ -85,7 +85,7 @@ class ExcelBindReadExecutor<R> extends ExcelBaseReadExecutor<R> {
                     continue;
                 }
                 ExcelField excelField = field.getAnnotation(ExcelField.class);
-                Cell valueCell = row.getCell(c);
+                Cell valueCell = row.getCell(c + super.startCol);
                 Object value;
                 if (valueCell != null) {
                     value = super.getValue(r, valueCell, field, excelField.trim(), excelField.required(), RowType.BODY, ExecMode.BIND_READ);

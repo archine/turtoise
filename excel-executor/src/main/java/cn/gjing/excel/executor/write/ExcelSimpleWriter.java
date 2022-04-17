@@ -25,7 +25,31 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
     }
 
     /**
+     * Set the Excel single-level header
+     * The order attribute of the generated header field is set to the order in which the elements appear in the header array you pass in, starting at 0
+     *
+     * @param headNames Excel single-level array of header names
+     * @return this
+     */
+    public ExcelSimpleWriter head(String... headNames) {
+        if (headNames == null || headNames.length == 0) {
+            throw new ExcelException("excel header names cannot be null");
+        }
+        List<ExcelFieldProperty> properties = new ArrayList<>(headNames.length);
+        for (String headName : headNames) {
+            properties.add(ExcelFieldProperty.builder()
+                    .order(properties.size())
+                    .value(new String[]{headName})
+                    .build());
+        }
+        super.context.setHeaderSeries(1);
+        super.context.setFieldProperties(properties);
+        return this;
+    }
+
+    /**
      * Set the Excel header
+     * The order attribute of the generated header field is set to the order in which the elements appear in the header array you pass in, starting at 0
      *
      * @param headNames Excel header name arrays, According to the first header array
      *                  size to determine the header hierarchy,
@@ -33,31 +57,33 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      * @return this
      */
     public ExcelSimpleWriter head(List<String[]> headNames) {
-        if (headNames != null && !headNames.isEmpty()) {
-            super.context.setHeaderSeries(headNames.get(0).length);
-            List<ExcelFieldProperty> properties = new ArrayList<>(headNames.size());
-            for (String[] headName : headNames) {
-                properties.add(ExcelFieldProperty.builder()
-                        .value(headName)
-                        .order(properties.size())
-                        .build());
-            }
-            super.context.setFieldProperties(properties);
+        if (headNames == null || headNames.isEmpty()) {
+            throw new ExcelException("excel header names cannot be null");
         }
+        List<ExcelFieldProperty> properties = new ArrayList<>(headNames.size());
+        for (String[] headName : headNames) {
+            properties.add(ExcelFieldProperty.builder()
+                    .value(headName)
+                    .order(properties.size())
+                    .build());
+        }
+        super.context.setHeaderSeries(headNames.get(0).length);
+        super.context.setFieldProperties(properties);
         return this;
     }
 
     /**
      * Set the Excel property
      *
-     * @param properties Excel filed property
+     * @param properties Excel filed property, the ExcelFieldProperty order attribute needs to be configured if it needs to be used in listeners
      * @return this
      */
     public ExcelSimpleWriter head2(List<ExcelFieldProperty> properties) {
-        if (properties != null && !properties.isEmpty()) {
-            super.context.setFieldProperties(properties);
-            super.context.setHeaderSeries(properties.get(0).getValue().length);
+        if (properties == null || properties.isEmpty()) {
+            throw new ExcelException("excel filed property cannot be null");
         }
+        super.context.setFieldProperties(properties);
+        super.context.setHeaderSeries(properties.get(0).getValue().length);
         return this;
     }
 
@@ -103,10 +129,7 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
     public ExcelSimpleWriter writeTitle(BigTitle bigTitle, String sheetName) {
         if (bigTitle != null) {
             super.createSheet(sheetName);
-            if (bigTitle.getLastCol() < 1) {
-                bigTitle.setLastCol(super.context.getFieldProperties().size() - 1);
-            }
-            super.writerResolver.writeTitle(bigTitle);
+            super.writeExecutor.writeTitle(bigTitle);
         }
         return this;
     }
@@ -153,12 +176,11 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      */
     public ExcelSimpleWriter write(List<List<Object>> data, String sheetName, boolean needHead) {
         super.createSheet(sheetName);
-        if (data == null) {
-            super.context.setTemplate(true);
-            super.writerResolver.writeHead(needHead);
-        } else {
-            super.writerResolver.writeHead(needHead)
-                    .write(data);
+        if (needHead) {
+            super.writeExecutor.writeHead();
+        }
+        if (data != null && !data.isEmpty()) {
+            super.writeExecutor.writeBody(data);
         }
         return this;
     }
@@ -212,6 +234,20 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      */
     public ExcelSimpleWriter unbind() {
         super.context.setBind(false);
+        return this;
+    }
+
+    /**
+     * Set the current write position
+     *
+     * @param startCol col index, based on 0
+     * @return this
+     */
+    public ExcelSimpleWriter withPosition(int startCol) {
+        if (startCol < 0) {
+            throw new ExcelException("write a column index that cannot be less than 0");
+        }
+        super.writeExecutor.setPosition(startCol);
         return this;
     }
 }

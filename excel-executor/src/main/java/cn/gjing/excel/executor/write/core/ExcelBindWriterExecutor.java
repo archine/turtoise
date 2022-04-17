@@ -5,7 +5,7 @@ import cn.gjing.excel.base.annotation.ExcelDataConvert;
 import cn.gjing.excel.base.context.ExcelWriterContext;
 import cn.gjing.excel.base.meta.ELMeta;
 import cn.gjing.excel.base.meta.RowType;
-import cn.gjing.excel.base.util.BeanUtils;
+import cn.gjing.excel.executor.util.BeanUtils;
 import cn.gjing.excel.base.util.ExcelUtils;
 import cn.gjing.excel.base.util.ListenerChain;
 import org.apache.poi.ss.usermodel.Cell;
@@ -20,27 +20,25 @@ import java.util.List;
  *
  * @author Gjing
  **/
-class ExcelBindWriterExecutor extends ExcelBaseWriteExecutor {
+public class ExcelBindWriterExecutor extends ExcelBaseWriteExecutor {
     public ExcelBindWriterExecutor(ExcelWriterContext context) {
         super(context);
     }
 
     @Override
-    public void writeHead(boolean needHead) {
-        if (!needHead) {
-            return;
-        }
+    public void writeHead() {
         Row headRow;
         for (int index = 0; index < this.context.getHeaderSeries(); index++) {
             ListenerChain.doCreateRowBefore(this.context.getListenerCache(), this.context.getSheet(), index, RowType.HEAD);
-            headRow = this.context.getSheet().createRow(this.context.getSheet().getPhysicalNumberOfRows());
+            headRow = this.context.getSheet().createRow(this.context.getSheet().getLastRowNum() + 1);
             if (this.context.getHeaderHeight() > 0) {
                 headRow.setHeight(this.context.getHeaderHeight());
             }
-            for (int colIndex = 0, headSize = this.context.getFieldProperties().size(); colIndex < headSize; colIndex++) {
-                ExcelFieldProperty property = this.context.getFieldProperties().get(colIndex);
+            for (int fieldIndex = 0, headSize = this.context.getFieldProperties().size(); fieldIndex < headSize; fieldIndex++) {
+                ExcelFieldProperty property = this.context.getFieldProperties().get(fieldIndex);
                 String headName = property.getValue()[index];
-                Cell headCell = headRow.createCell(headRow.getPhysicalNumberOfCells());
+                short lastCellNum = headRow.getLastCellNum();
+                Cell headCell = headRow.createCell(lastCellNum == -1 ? super.startCol : lastCellNum);
                 ListenerChain.doSetHeadStyle(this.context.getListenerCache(), headRow, headCell, property, index);
                 headName = (String) ListenerChain.doAssignmentBefore(this.context.getListenerCache(), this.context.getSheet(), headRow, headCell, property, index, RowType.HEAD, headName);
                 headCell.setCellValue(headName);
@@ -57,14 +55,15 @@ class ExcelBindWriterExecutor extends ExcelBaseWriteExecutor {
             Object o = data.get(index);
             context.setVariable(o.getClass().getSimpleName(), o);
             ListenerChain.doCreateRowBefore(this.context.getListenerCache(), this.context.getSheet(), index, RowType.BODY);
-            Row valueRow = this.context.getSheet().createRow(this.context.getSheet().getPhysicalNumberOfRows());
+            Row valueRow = this.context.getSheet().createRow(this.context.getSheet().getLastRowNum() + 1);
             if (this.context.getBodyHeight() > 0) {
                 valueRow.setHeight(this.context.getBodyHeight());
             }
-            for (int colIndex = 0, headSize = this.context.getFieldProperties().size(); colIndex < headSize; colIndex++) {
-                ExcelFieldProperty property = this.context.getFieldProperties().get(colIndex);
+            for (int fieldIndex = 0, headSize = this.context.getFieldProperties().size(); fieldIndex < headSize; fieldIndex++) {
+                ExcelFieldProperty property = this.context.getFieldProperties().get(fieldIndex);
                 Object value = BeanUtils.getFieldValue(o, property.getField());
-                Cell valueCell = valueRow.createCell(valueRow.getPhysicalNumberOfCells());
+                short lastCellNum = valueRow.getLastCellNum();
+                Cell valueCell = valueRow.createCell(lastCellNum == -1 ? super.startCol : lastCellNum);
                 context.setVariable(property.getField().getName(), value);
                 ListenerChain.doSetBodyStyle(this.context.getListenerCache(), valueRow, valueCell, property, index);
                 value = this.convert(value, property.getField().getAnnotation(ExcelDataConvert.class), context);

@@ -3,21 +3,23 @@ package cn.gjing.excel.executor.write;
 import cn.gjing.excel.base.aware.ExcelWorkbookAware;
 import cn.gjing.excel.base.aware.ExcelWriteContextAware;
 import cn.gjing.excel.base.context.ExcelWriterContext;
+import cn.gjing.excel.base.exception.ExcelException;
 import cn.gjing.excel.base.listener.write.ExcelWriteListener;
 import cn.gjing.excel.base.meta.ExcelInitializerMeta;
 import cn.gjing.excel.base.meta.ExcelType;
 import cn.gjing.excel.base.meta.ExecMode;
 import cn.gjing.excel.base.util.ListenerChain;
 import cn.gjing.excel.base.util.ParamUtils;
-import cn.gjing.excel.executor.write.core.ExcelWriteXlsResolver;
-import cn.gjing.excel.executor.write.core.ExcelWriteXlsxResolver;
-import cn.gjing.excel.executor.write.core.ExcelWriterResolver;
+import cn.gjing.excel.executor.write.core.ExcelBaseWriteExecutor;
+import cn.gjing.excel.executor.write.core.ExcelBindWriterExecutor;
+import cn.gjing.excel.executor.write.core.ExcelSimpleWriterExecutor;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.UUID;
 
 /**
@@ -28,7 +30,7 @@ import java.util.UUID;
 public abstract class ExcelBaseWriter {
     protected ExcelWriterContext context;
     protected HttpServletResponse response;
-    protected ExcelWriterResolver writerResolver;
+    protected ExcelBaseWriteExecutor writeExecutor;
     protected final String defaultSheetName = "Sheet1";
 
     protected ExcelBaseWriter(ExcelWriterContext context, int windowSize, HttpServletResponse response, ExecMode mode) {
@@ -55,14 +57,13 @@ public abstract class ExcelBaseWriter {
         switch (this.context.getExcelType()) {
             case XLS:
                 context.setWorkbook(new HSSFWorkbook());
-                this.writerResolver = new ExcelWriteXlsResolver(context, mode);
                 break;
             case XLSX:
                 context.setWorkbook(new SXSSFWorkbook(windowSize));
-                this.writerResolver = new ExcelWriteXlsxResolver(context, mode);
                 break;
             default:
         }
+        this.writeExecutor = mode == ExecMode.BIND_WRITE ? new ExcelBindWriterExecutor(context) : new ExcelSimpleWriterExecutor(context);
     }
 
     /**
@@ -71,10 +72,18 @@ public abstract class ExcelBaseWriter {
     public void flush() {
         this.processBind();
         if (ListenerChain.doWorkbookFlushBefore(this.context.getListenerCache(), this.context.getWorkbook())) {
-            this.writerResolver.flush(this.response, this.context);
+            this.writeExecutor.flush(this.response, this.context);
             if (this.context.getWorkbook() instanceof SXSSFWorkbook) {
                 ((SXSSFWorkbook) this.context.getWorkbook()).dispose();
             }
+            return;
+        }
+        try {
+            if (this.context.getWorkbook() != null) {
+                this.context.getWorkbook().close();
+            }
+        } catch (IOException e) {
+            throw new ExcelException(e.getMessage());
         }
     }
 
@@ -86,10 +95,18 @@ public abstract class ExcelBaseWriter {
     public void flushToLocal(String path) {
         this.processBind();
         if (ListenerChain.doWorkbookFlushBefore(this.context.getListenerCache(), this.context.getWorkbook())) {
-            this.writerResolver.flushToLocal(path, this.context);
+            this.writeExecutor.flushToLocal(path, this.context);
             if (this.context.getWorkbook() instanceof SXSSFWorkbook) {
                 ((SXSSFWorkbook) this.context.getWorkbook()).dispose();
             }
+            return;
+        }
+        try {
+            if (this.context.getWorkbook() != null) {
+                this.context.getWorkbook().close();
+            }
+        } catch (IOException e) {
+            throw new ExcelException(e.getMessage());
         }
     }
 
