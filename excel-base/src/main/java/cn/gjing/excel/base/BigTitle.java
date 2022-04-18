@@ -99,6 +99,15 @@ public final class BigTitle {
                 .build();
     }
 
+    public static BigTitle blank(int rowNum, int firstRow, int firstCol,int lastCol) {
+        return BigTitle.builder()
+                .rowNum(rowNum)
+                .firstRow(firstRow)
+                .firstCol(firstCol)
+                .lastCol(lastCol)
+                .build();
+    }
+
     public static BigTitle of(Object content, int rowNum, int firstRow, int firstCol) {
         return BigTitle.builder()
                 .content(content)

@@ -55,5 +55,5 @@ public class ExcelFieldProperty {
      * Font color index array
      */
     @Builder.Default
-    private ExcelColor[] fontColor = new ExcelColor[]{ExcelColor.WHITE};
+    private ExcelColor[] fontColor = new ExcelColor[]{ExcelColor.BLACK};
 }

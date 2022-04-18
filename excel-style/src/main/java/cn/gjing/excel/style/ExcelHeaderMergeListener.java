@@ -5,6 +5,7 @@ import cn.gjing.excel.base.context.ExcelWriterContext;
 import cn.gjing.excel.base.listener.write.ExcelRowWriteListener;
 import cn.gjing.excel.base.meta.RowType;
 import cn.gjing.excel.base.util.ExcelUtils;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
@@ -27,57 +28,66 @@ public class ExcelHeaderMergeListener implements ExcelRowWriteListener, ExcelWri
 
     @Override
     public void completeRow(Sheet sheet, Row row, Object obj, int index, RowType rowType) {
-        if (rowType != RowType.HEAD) {
-            return;
-        }
-        if (index == 0) {
-            int startCol = 0;
-            int endCol = 0;
-            int startRow = row.getRowNum();
-            int endRow = row.getRowNum();
-            // The depth of the header
-            int level;
-            // The next header column is indexed
-            int nextHeadIndex = 1;
-            for (int i = 0; i < this.writerContext.getHeaderSeries(); i++) {
-                level = i;
-                for (int j = 0, len = this.writerContext.getFieldProperties().size(); j < len; j++) {
-                    if (nextHeadIndex - j < 1) {
-                        nextHeadIndex++;
+        if (rowType == RowType.HEAD) {
+            if (index + 1 == this.writerContext.getHeaderSeries()) {
+                int nextRowIndex;
+                int nextColIndex = 1;
+                int firstCol = 0;
+                int lastCol = 0;
+                int firstRow = row.getRowNum() - this.writerContext.getHeaderSeries() + 1;
+                int lastRow = firstRow;
+                for (int y = firstRow, last = this.writerContext.getHeaderSeries() + firstRow; y < last; y++) {
+                    Row currentRow = sheet.getRow(y);
+                    nextRowIndex = y + 1;
+                    for (int x = 0, colNums = currentRow.getLastCellNum(); x < colNums; x++) {
+                        Cell cell = currentRow.getCell(x);
+                        if (cell == null) {
+                            firstCol = x + 1;
+                            lastCol = firstCol;
+                            nextColIndex++;
+                            continue;
+                        }
+                        while (colNums > nextColIndex) {
+                            Cell cell2 = currentRow.getCell(nextColIndex);
+                            if (cell2 == null) {
+                                x = nextColIndex;
+                                nextColIndex += 2;
+                                break;
+                            }
+                            if (cell.getStringCellValue().equals(cell2.getStringCellValue())) {
+                                lastCol = nextColIndex++;
+                                continue;
+                            }
+                            nextColIndex++;
+                            break;
+                        }
+                        while (last > nextRowIndex) {
+                            Row nextRow = sheet.getRow(nextRowIndex);
+                            Cell nextCell = nextRow.getCell(x);
+                            if (nextCell == null || !cell.getStringCellValue().equals(nextCell.getStringCellValue())) {
+                                break;
+                            }
+                            lastRow++;
+                            nextRowIndex++;
+                        }
+                        if (firstCol != lastCol || firstRow != lastRow) {
+                            ExcelUtils.merge(this.writerContext.getSheet(), firstCol, lastCol, firstRow, lastRow);
+                            x = lastCol;
+                            firstCol = x + 1;
+                            lastCol = firstCol;
+                            lastRow = firstRow;
+                            nextRowIndex = y + 1;
+                        } else {
+                            firstCol = x + 1;
+                            lastCol = firstCol;
+                        }
                     }
-                    if (ExcelUtils.isMerge(sheet, startRow, j)) {
-                        startCol = nextHeadIndex;
-                        endCol = nextHeadIndex;
-                        continue;
-                    }
-                    // Wide search
-                    while (len > nextHeadIndex && this.writerContext.getFieldProperties().get(nextHeadIndex).getValue()[level].equals(this.writerContext.getFieldProperties().get(nextHeadIndex - 1).getValue()[level])) {
-                        endCol = nextHeadIndex;
-                        nextHeadIndex++;
-                        j = endCol;
-                    }
-                    // Deep search
-                    while (this.writerContext.getHeaderSeries() - 1 > level && this.writerContext.getFieldProperties().get(j).getValue()[level].equals(this.writerContext.getFieldProperties().get(j).getValue()[level + 1])) {
-                        endRow++;
-                        level++;
-                    }
-                    if (startCol != endCol || startRow != endRow) {
-                        ExcelUtils.merge(this.writerContext.getSheet(), startCol, endCol, startRow, endRow);
-                        level = i;
-                        startCol = nextHeadIndex;
-                        endCol = nextHeadIndex;
-                        endRow = startRow;
-                        continue;
-                    }
-                    startCol = nextHeadIndex;
-                    endCol = nextHeadIndex;
+                    firstCol = 0;
+                    lastCol = 0;
+                    firstRow++;
+                    lastRow = firstRow;
+                    nextColIndex = 1;
                 }
-                // Init param
-                startCol = 0;
-                endCol = 0;
-                startRow = startRow + 1;
-                endRow = startRow;
-                nextHeadIndex = 1;
             }
         }
     }

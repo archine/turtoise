@@ -6,10 +6,9 @@ import cn.gjing.excel.base.context.ExcelWriterContext;
 import cn.gjing.excel.base.exception.ExcelException;
 import cn.gjing.excel.base.listener.ExcelListener;
 import cn.gjing.excel.base.listener.write.ExcelWriteListener;
-import cn.gjing.excel.base.meta.ExcelInitializerMeta;
 import cn.gjing.excel.base.meta.ExecMode;
-import cn.gjing.excel.executor.util.BeanUtils;
 import cn.gjing.excel.executor.read.ExcelBindReader;
+import cn.gjing.excel.executor.util.BeanUtils;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletResponse;
@@ -124,17 +123,13 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
     }
 
     /**
-     * Clears listeners in the current context, which triggers the listener initializer again.
-     * <p>
-     * Excel entities in the current context are passed to the listener initializer,
-     * so they should be called after the {@link #resetEntity(Class, String...)} method.
+     * Clears listeners in the current context
      *
      * @param predicate The assertion condition, true, is removed
      * @return this
      */
     public ExcelBindWriter resetListeners(Predicate<ExcelListener> predicate) {
         super.context.getListenerCache().removeIf(predicate);
-        ExcelInitializerMeta.INSTANT.initListener(super.context.getExcelEntity(), ExecMode.BIND_WRITE, super.context.getListenerCache());
         return this;
     }
 

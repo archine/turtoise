@@ -47,7 +47,6 @@ public final class GrayColorExcelStyleListener implements ExcelStyleWriteListene
         this.headStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         this.headStyle.setFillForegroundColor(ExcelColor.GREY_25_PERCENT.index);
         Font font = writerContext.getWorkbook().createFont();
-        font.setBold(true);
         this.headStyle.setFont(font);
         StyleUtils.setAlignment(this.headStyle);
         StyleUtils.setBorder(this.headStyle, ExcelColor.GREY_40_PERCENT);
@@ -80,9 +79,7 @@ public final class GrayColorExcelStyleListener implements ExcelStyleWriteListene
         if (dataIndex == 0) {
             int columnIndex = cell.getColumnIndex();
             StyleUtils.setColumnWidth(property, columnIndex, this.writerContext);
-            if (this.writerContext.isTemplate()) {
-                this.writerContext.getSheet().setDefaultColumnStyle(columnIndex, StyleUtils.createCacheStyle(property, this.bodyStyles, this.writerContext));
-            }
+            this.writerContext.getSheet().setDefaultColumnStyle(columnIndex, StyleUtils.createCacheStyle(property, this.bodyStyles, this.writerContext));
         }
         cell.setCellStyle(this.headStyle);
     }

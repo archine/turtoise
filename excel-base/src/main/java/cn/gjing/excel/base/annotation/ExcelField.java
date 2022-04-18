@@ -100,5 +100,5 @@ public @interface ExcelField {
      * @return index
      * @see ExcelColor
      */
-    ExcelColor[] fontColor() default ExcelColor.WHITE;
+    ExcelColor[] fontColor() default ExcelColor.BLACK;
 }

@@ -46,9 +46,9 @@ public final class NoneColorExcelStyleListener implements ExcelStyleWriteListene
         this.writerContext = writerContext;
         this.cellStyle = writerContext.getWorkbook().createCellStyle();
         Font font = writerContext.getWorkbook().createFont();
-        font.setBold(true);
         cellStyle.setFont(font);
         StyleUtils.setAlignment(cellStyle);
+        StyleUtils.setBorder(this.cellStyle, ExcelColor.GREY_50_PERCENT);
     }
 
     @Override
@@ -78,9 +78,7 @@ public final class NoneColorExcelStyleListener implements ExcelStyleWriteListene
         if (dataIndex == 0) {
             int columnIndex = cell.getColumnIndex();
             StyleUtils.setColumnWidth(property, columnIndex, this.writerContext);
-            if (this.writerContext.isTemplate()) {
-                this.writerContext.getSheet().setDefaultColumnStyle(columnIndex, StyleUtils.createCacheStyle(property, this.bodyStyles, this.writerContext));
-            }
+            this.writerContext.getSheet().setDefaultColumnStyle(columnIndex, StyleUtils.createCacheStyle(property, this.bodyStyles, this.writerContext));
         }
         cell.setCellStyle(this.cellStyle);
     }

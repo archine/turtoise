@@ -3,7 +3,10 @@ package cn.gjing.excel.style.util;
 import cn.gjing.excel.base.ExcelFieldProperty;
 import cn.gjing.excel.base.context.ExcelWriterContext;
 import cn.gjing.excel.base.meta.ExcelColor;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 
 import java.util.Map;
 
@@ -37,6 +40,8 @@ public class StyleUtils {
         cellStyle.setLeftBorderColor(color.index);
         cellStyle.setBorderRight(BorderStyle.THIN);
         cellStyle.setRightBorderColor(color.index);
+        cellStyle.setBorderTop(BorderStyle.THIN);
+        cellStyle.setTopBorderColor(color.index);
     }
 
     /**

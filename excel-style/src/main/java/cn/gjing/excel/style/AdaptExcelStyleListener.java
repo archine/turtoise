@@ -83,9 +83,7 @@ public final class AdaptExcelStyleListener implements ExcelStyleWriteListener, E
         if (dataIndex == 0) {
             int columnIndex = cell.getColumnIndex();
             StyleUtils.setColumnWidth(property, columnIndex, this.writerContext);
-            if (this.writerContext.isTemplate()) {
-                this.writerContext.getSheet().setDefaultColumnStyle(columnIndex, StyleUtils.createCacheStyle(property, this.bodyStyles, this.writerContext));
-            }
+            this.writerContext.getSheet().setDefaultColumnStyle(columnIndex, StyleUtils.createCacheStyle(property, this.bodyStyles, this.writerContext));
         }
         int colorLen = property.getColor().length;
         int fontColorLen = property.getFontColor().length;
@@ -98,7 +96,6 @@ public final class AdaptExcelStyleListener implements ExcelStyleWriteListener, E
             cellStyle.setFillForegroundColor(backgroundColor.index);
             cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
             Font font = this.writerContext.getWorkbook().createFont();
-            font.setBold(true);
             font.setColor(fontColor.index);
             cellStyle.setFont(font);
             StyleUtils.setBorder(cellStyle, ExcelColor.GREY_40_PERCENT);

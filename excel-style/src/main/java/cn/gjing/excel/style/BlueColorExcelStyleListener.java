@@ -47,7 +47,6 @@ public final class BlueColorExcelStyleListener implements ExcelStyleWriteListene
         this.headStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         this.headStyle.setFillForegroundColor(ExcelColor.PALE_BLUE.index);
         Font font = writerContext.getWorkbook().createFont();
-        font.setBold(true);
         font.setColor(ExcelColor.GREY_80_PERCENT.index);
         this.headStyle.setFont(font);
         StyleUtils.setAlignment(this.headStyle);
@@ -81,9 +80,7 @@ public final class BlueColorExcelStyleListener implements ExcelStyleWriteListene
         if (dataIndex == 0) {
             int columnIndex = cell.getColumnIndex();
             StyleUtils.setColumnWidth(property, columnIndex, this.writerContext);
-            if (this.writerContext.isTemplate()) {
-                this.writerContext.getSheet().setDefaultColumnStyle(columnIndex, StyleUtils.createCacheStyle(property, this.bodyStyles, this.writerContext));
-            }
+            this.writerContext.getSheet().setDefaultColumnStyle(columnIndex, StyleUtils.createCacheStyle(property, this.bodyStyles, this.writerContext));
         }
         cell.setCellStyle(this.headStyle);
     }
