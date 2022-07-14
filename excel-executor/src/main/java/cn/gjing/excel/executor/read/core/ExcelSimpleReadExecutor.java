@@ -1,7 +1,6 @@
 package cn.gjing.excel.executor.read.core;
 
 import cn.gjing.excel.base.context.ExcelReaderContext;
-import cn.gjing.excel.base.meta.ExecMode;
 import cn.gjing.excel.base.meta.RowType;
 import cn.gjing.excel.base.util.ListenerChain;
 import org.apache.poi.ss.usermodel.Cell;
@@ -43,7 +42,7 @@ public class ExcelSimpleReadExecutor<R> extends ExcelBaseReadExecutor<R> {
                 Cell cell = row.getCell(i + super.startCol);
                 Object value;
                 if (cell != null) {
-                    value = this.getValue(null, cell, null, false, false, RowType.BODY, ExecMode.SIMPLE_READ);
+                    value = this.getValue(null, cell, null, false, false, RowType.BODY);
                     ListenerChain.doReadCell(super.context.getListenerCache(), value, cell, row.getRowNum(), i, RowType.BODY);
                 } else {
                     ListenerChain.doReadCell(super.context.getListenerCache(), null, null, row.getRowNum(), i, RowType.BODY);

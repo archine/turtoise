@@ -4,11 +4,10 @@ import cn.gjing.excel.base.context.ExcelReaderContext;
 import cn.gjing.excel.base.exception.ExcelException;
 import cn.gjing.excel.base.exception.ExcelTemplateException;
 import cn.gjing.excel.base.listener.ExcelListener;
-import cn.gjing.excel.base.meta.ExecMode;
 import cn.gjing.excel.base.meta.RowType;
-import cn.gjing.excel.executor.util.JsonUtils;
 import cn.gjing.excel.base.util.ListenerChain;
 import cn.gjing.excel.base.util.ParamUtils;
+import cn.gjing.excel.executor.read.FormulaReader;
 import com.monitorjbl.xlsx.impl.StreamingWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -27,6 +26,7 @@ public abstract class ExcelBaseReadExecutor<R> {
     protected final ExcelReaderContext<R> context;
     protected boolean saveCurrentRowObj;
     protected int startCol;
+    protected FormulaReader formulaReader;
 
     public ExcelBaseReadExecutor(ExcelReaderContext<R> context) {
         this.context = context;
@@ -39,6 +39,15 @@ public abstract class ExcelBaseReadExecutor<R> {
      */
     public void setPosition(int startCol) {
         this.startCol = startCol;
+    }
+
+    /**
+     * Set the formula reader
+     *
+     * @param formulaReader FormulaReader
+     */
+    public void setFormulaReader(FormulaReader formulaReader) {
+        this.formulaReader = formulaReader;
     }
 
     /**
@@ -80,7 +89,7 @@ public abstract class ExcelBaseReadExecutor<R> {
     protected boolean readOther(List<ExcelListener> rowReadListeners, Row row) {
         if (this.context.isReadOther()) {
             for (Cell cell : row) {
-                Object value = this.getValue(null, cell, null, false, false, RowType.OTHER, ExecMode.SIMPLE_READ);
+                Object value = this.getValue(null, cell, null, false, false, RowType.OTHER);
                 ListenerChain.doReadCell(rowReadListeners, value, cell, row.getRowNum(), cell.getColumnIndex(), RowType.OTHER);
             }
             return ListenerChain.doReadRow(rowReadListeners, null, row, RowType.OTHER);
@@ -134,17 +143,16 @@ public abstract class ExcelBaseReadExecutor<R> {
      * @param field    Current field
      * @param r        Current row generated row
      * @param rowType  rowType Current row type
-     * @param execMode Executor mode
      * @return value
      */
-    protected Object getValue(R r, Cell cell, Field field, boolean trim, boolean required, RowType rowType, ExecMode execMode) {
+    protected Object getValue(R r, Cell cell, Field field, boolean trim, boolean required, RowType rowType) {
         switch (cell.getCellType()) {
             case _NONE:
             case BLANK:
             case ERROR:
                 if (rowType == RowType.BODY) {
                     if (required) {
-                        this.saveCurrentRowObj = ListenerChain.doReadEmpty(this.context.getListenerCache(), r, cell.getRowIndex(),cell.getColumnIndex());
+                        this.saveCurrentRowObj = ListenerChain.doReadEmpty(this.context.getListenerCache(), r, cell.getRowIndex(), cell.getColumnIndex());
                     }
                 }
                 break;
@@ -154,15 +162,12 @@ public abstract class ExcelBaseReadExecutor<R> {
                 if (DateUtil.isCellDateFormatted(cell)) {
                     return cell.getDateCellValue();
                 }
-                if (execMode == ExecMode.BIND_READ) {
-                    return rowType == RowType.BODY ? JsonUtils.toObj(JsonUtils.toJson(cell.getNumericCellValue()), field.getType()) : cell.getNumericCellValue();
-                }
                 return cell.getNumericCellValue();
             case FORMULA:
-                if (execMode == ExecMode.BIND_READ) {
-                    return rowType == RowType.BODY ? JsonUtils.toObj(JsonUtils.toJson(cell.getStringCellValue()), field.getType()) : cell.getStringCellValue();
+                if (formulaReader == null) {
+                    throw new ExcelException("The current Excel file has cells of formula type, so you need to set the formula reader");
                 }
-                return cell.getStringCellValue();
+                return this.formulaReader.read(cell, field, rowType);
             default:
                 return trim ? cell.getStringCellValue().trim() : cell.getStringCellValue();
         }

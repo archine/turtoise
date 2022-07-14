@@ -8,11 +8,11 @@ import cn.gjing.excel.base.exception.ExcelAssertException;
 import cn.gjing.excel.base.exception.ExcelException;
 import cn.gjing.excel.base.listener.ExcelListener;
 import cn.gjing.excel.base.meta.ELMeta;
-import cn.gjing.excel.base.meta.ExecMode;
 import cn.gjing.excel.base.meta.RowType;
-import cn.gjing.excel.executor.util.BeanUtils;
 import cn.gjing.excel.base.util.ListenerChain;
 import cn.gjing.excel.base.util.ParamUtils;
+import cn.gjing.excel.executor.util.BeanUtils;
+import cn.gjing.excel.executor.util.JsonUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.springframework.expression.EvaluationContext;
@@ -88,7 +88,7 @@ public class ExcelBindReadExecutor<R> extends ExcelBaseReadExecutor<R> {
                 Cell valueCell = row.getCell(c + super.startCol);
                 Object value;
                 if (valueCell != null) {
-                    value = super.getValue(r, valueCell, field, excelField.trim(), excelField.required(), RowType.BODY, ExecMode.BIND_READ);
+                    value = super.getValue(r, valueCell, field, excelField.trim(), excelField.required(), RowType.BODY);
                     if (!super.saveCurrentRowObj) {
                         break;
                     }
@@ -150,6 +150,9 @@ public class ExcelBindReadExecutor<R> extends ExcelBaseReadExecutor<R> {
      */
     private void setValue(R o, Field field, Object value) {
         try {
+            if (field.getType() != value.getClass()) {
+                value = JsonUtils.toObj(JsonUtils.toJson(value), field.getType());
+            }
             BeanUtils.setFieldValue(o, field, value);
         } catch (RuntimeException e) {
             if (field.getType() == LocalDate.class) {

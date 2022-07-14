@@ -139,4 +139,15 @@ public class ExcelSimpleReader<R> extends ExcelBaseReader<R> {
         super.baseReadExecutor.setPosition(startCol);
         return this;
     }
+
+    /**
+     * Set the formula reader
+     *
+     * @param formulaReader FormulaReader
+     * @return this
+     */
+    public ExcelSimpleReader<R> setFormulaReader(FormulaReader formulaReader) {
+        super.baseReadExecutor.setFormulaReader(formulaReader);
+        return this;
+    }
 }
