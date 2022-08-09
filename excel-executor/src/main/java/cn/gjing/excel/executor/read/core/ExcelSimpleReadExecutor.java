@@ -22,30 +22,34 @@ public class ExcelSimpleReadExecutor<R> extends ExcelBaseReadExecutor<R> {
         super.checkSheet(sheetName);
         ListenerChain.doReadBefore(super.context.getListenerCache());
         boolean continueRead = true;
+        int rowNum;
+        int colNum;
         for (Row row : super.context.getSheet()) {
             if (!continueRead) {
                 break;
             }
-            if (row.getRowNum() < headerIndex) {
+            rowNum = row.getRowNum();
+            if (rowNum < headerIndex) {
                 continueRead = super.readOther(super.context.getListenerCache(), row);
                 continue;
             }
-            if (row.getRowNum() == headerIndex) {
+            if (rowNum == headerIndex) {
                 continueRead = super.readHeader(super.context.getListenerCache(), row);
                 continue;
             }
             for (int i = 0, size = super.context.getHeadNames().size(); i < size; i++) {
+                colNum = super.startCol + i;
                 String head = super.context.getHeadNames().get(i);
                 if ("ignored".equals(head)) {
                     continue;
                 }
-                Cell cell = row.getCell(i + super.startCol);
+                Cell cell = row.getCell(colNum);
                 Object value;
                 if (cell != null) {
                     value = this.getValue(null, cell, null, false, false, RowType.BODY);
-                    ListenerChain.doReadCell(super.context.getListenerCache(), value, cell, row.getRowNum(), i, RowType.BODY);
+                    ListenerChain.doReadCell(super.context.getListenerCache(), value, cell, row.getRowNum(), colNum, RowType.BODY);
                 } else {
-                    ListenerChain.doReadCell(super.context.getListenerCache(), null, null, row.getRowNum(), i, RowType.BODY);
+                    ListenerChain.doReadCell(super.context.getListenerCache(), null, null, rowNum, colNum, RowType.BODY);
                 }
             }
             continueRead = ListenerChain.doReadRow(super.context.getListenerCache(), null, row, RowType.BODY);

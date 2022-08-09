@@ -5,11 +5,11 @@
     <parent>
         <artifactId>turtoise</artifactId>
         <groupId>cn.gjing</groupId>
-        <version>2022.2.1</version>
+        <version>2022.2.3</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>excel-style</artifactId>
-    <version>2022.1.3</version>
+    <version>2022.1.4</version>
     <description>Excel样式</description>
 
     <properties>
@@ -22,7 +22,7 @@
         <dependency>
             <groupId>cn.gjing</groupId>
             <artifactId>excel-base</artifactId>
-            <version>2022.1.6</version>
+            <version>2022.1.7</version>
             <optional>true</optional>
         </dependency>
     </dependencies>

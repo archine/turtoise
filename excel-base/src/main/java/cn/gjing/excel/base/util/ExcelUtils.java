@@ -162,26 +162,7 @@ public final class ExcelUtils {
      * @return If the input parameter is 1,1,10, return $B$1:$K$1
      */
     public static String createFormulaX(int startColIndex, int rowIndex, int endColIndex) {
-        char start = (char) ('A' + startColIndex);
-        if (endColIndex <= 25) {
-            if (endColIndex == 0) {
-                return "$" + start + "$" + rowIndex;
-            } else {
-                char end = (char) (start + endColIndex - 1);
-                return "$" + start + "$" + rowIndex + ":$" + end + "$" + rowIndex;
-            }
-        } else {
-            char endPrefix = 'A';
-            char endSuffix;
-            if ((endColIndex - 25) % 26 == 0) {
-                endSuffix = (char) ('A' + 25);
-                endPrefix = (char) (endPrefix + (endColIndex - 25) / 26 - 1);
-            } else {
-                endSuffix = (char) ('A' + (endColIndex - 25) % 26 - 1);
-                endPrefix = (char) (endPrefix + (endColIndex - 25) / 26);
-            }
-            return "$" + start + "$" + rowIndex + ":$" + endPrefix + endSuffix + "$" + rowIndex;
-        }
+        return "$" + ParamUtils.numberToEn(startColIndex) + "$" + rowIndex + ":$" + ParamUtils.numberToEn(endColIndex) + "$" + rowIndex;
     }
 
     /**
@@ -193,10 +174,7 @@ public final class ExcelUtils {
      * @return If the input parameter is 1,2,5, return $B$2:$B$5
      */
     public static String createFormulaY(int colIndex, int startRow, int endRow) {
-        if (colIndex < 26) {
-            return "$" + (char) ('A' + colIndex) + "$" + startRow + ":$" + (char) ('A' + colIndex) + "$" + endRow;
-        }
-        String all = ParamUtils.numberToEn(colIndex);
-        return "$" + all + "$" + startRow + ":$" + all + "$" + endRow;
+        String colEn = ParamUtils.numberToEn(colIndex);
+        return "$" + colEn + "$" + startRow + ":$" + colEn + "$" + endRow;
     }
 }
