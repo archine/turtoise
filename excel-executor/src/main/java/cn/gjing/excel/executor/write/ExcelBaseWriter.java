@@ -36,12 +36,12 @@ public abstract class ExcelBaseWriter {
     protected ExcelBaseWriter(ExcelWriterContext context, int windowSize, HttpServletResponse response, ExecMode mode) {
         this.response = response;
         this.context = context;
-        this.chooseResolver(context, windowSize, mode);
         ExcelInitializerMeta.INSTANT.initListener(context.getExcelEntity(), mode, context.getListenerCache());
         ExcelType globalType = ExcelInitializerMeta.INSTANT.initType(context.getExcelEntity(), mode);
         if (globalType != null) {
             context.setExcelType(globalType);
         }
+        this.chooseResolver(context, windowSize, mode);
         context.getListenerCache().forEach(e -> this.initAware((ExcelWriteListener) e));
     }
 
