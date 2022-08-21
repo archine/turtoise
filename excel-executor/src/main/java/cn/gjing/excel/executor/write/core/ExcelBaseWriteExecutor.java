@@ -1,11 +1,14 @@
 package cn.gjing.excel.executor.write.core;
 
 import cn.gjing.excel.base.BigTitle;
+import cn.gjing.excel.base.ExcelFieldProperty;
 import cn.gjing.excel.base.context.ExcelWriterContext;
 import cn.gjing.excel.base.exception.ExcelException;
 import cn.gjing.excel.base.meta.ExcelType;
-import cn.gjing.excel.base.util.ExcelUtils;
-import cn.gjing.excel.base.util.ListenerChain;
+import cn.gjing.excel.base.meta.RowType;
+import cn.gjing.excel.executor.WRMode;
+import cn.gjing.excel.executor.util.ExcelUtils;
+import cn.gjing.excel.executor.util.ListenerChain;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -24,19 +27,19 @@ import java.util.List;
  **/
 public abstract class ExcelBaseWriteExecutor {
     protected final ExcelWriterContext context;
-    protected int startCol;
+    protected WRMode wrMode;
 
     public ExcelBaseWriteExecutor(ExcelWriterContext context) {
         this.context = context;
     }
 
     /**
-     * Sets the location where data is to be written
+     * Set excel write mode
      *
-     * @param startCol column index
+     * @param mode WRMode
      */
-    public void setPosition(int startCol) {
-        this.startCol = startCol;
+    public void setWriteMode(WRMode mode) {
+        this.wrMode = mode;
     }
 
     /**
@@ -78,7 +81,27 @@ public abstract class ExcelBaseWriteExecutor {
     /**
      * Write excel head
      */
-    public abstract void writeHead();
+    public void writeHead(){
+        Row headRow;
+        for (int level = 0; level < this.context.getHeaderSeries(); level++) {
+            ListenerChain.doCreateRowBefore(this.context.getListenerCache(), this.context.getSheet(), level, RowType.HEAD);
+            headRow = this.context.getSheet().createRow(this.context.getSheet().getLastRowNum() + 1);
+            if (this.context.getHeaderHeight() > 0) {
+                headRow.setHeight(this.context.getHeaderHeight());
+            }
+            for (int fieldIndex = 0, headSize = this.context.getFieldProperties().size(); fieldIndex < headSize; fieldIndex++) {
+                ExcelFieldProperty property = this.context.getFieldProperties().get(fieldIndex);
+                String headName = property.getValue()[level];
+                short lastCellNum = this.wrMode == WRMode.INDEX ? property.getIndex() : headRow.getLastCellNum();
+                Cell headCell = headRow.createCell(lastCellNum == -1 ? 0 : lastCellNum);
+                ListenerChain.doSetHeadStyle(this.context.getListenerCache(), headRow, headCell, property, level);
+                headName = (String) ListenerChain.doAssignmentBefore(this.context.getListenerCache(), this.context.getSheet(), headRow, headCell, property, level, RowType.HEAD, headName);
+                headCell.setCellValue(headName);
+                ListenerChain.doCompleteCell(this.context.getListenerCache(), this.context.getSheet(), headRow, headCell, property, level, RowType.HEAD);
+            }
+            ListenerChain.doCompleteRow(this.context.getListenerCache(), this.context.getSheet(), headRow, null, level, RowType.HEAD);
+        }
+    };
 
     /**
      * Write excel body

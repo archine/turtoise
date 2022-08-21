@@ -1,4 +1,4 @@
-package cn.gjing.excel.base.util;
+package cn.gjing.excel.executor.util;
 
 import cn.gjing.excel.base.BigTitle;
 import cn.gjing.excel.base.ExcelFieldProperty;

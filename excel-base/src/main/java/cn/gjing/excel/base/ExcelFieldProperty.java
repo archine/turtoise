@@ -34,10 +34,10 @@ public class ExcelFieldProperty {
     private int width = 5120;
 
     /**
-     * Excel header actual sequence number, based on 0
+     * Excel header column index
      **/
     @Builder.Default
-    private int order = 0;
+    private short index = 0;
 
     /**
      * Cell format

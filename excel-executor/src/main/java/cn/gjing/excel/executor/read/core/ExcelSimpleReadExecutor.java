@@ -2,7 +2,7 @@ package cn.gjing.excel.executor.read.core;
 
 import cn.gjing.excel.base.context.ExcelReaderContext;
 import cn.gjing.excel.base.meta.RowType;
-import cn.gjing.excel.base.util.ListenerChain;
+import cn.gjing.excel.executor.util.ListenerChain;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 

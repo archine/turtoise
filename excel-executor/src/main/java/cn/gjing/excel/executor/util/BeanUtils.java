@@ -2,10 +2,12 @@ package cn.gjing.excel.executor.util;
 
 import cn.gjing.excel.base.ExcelFieldProperty;
 import cn.gjing.excel.base.annotation.ExcelField;
-import cn.gjing.excel.base.util.ParamUtils;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -57,7 +59,6 @@ public final class BeanUtils {
         List<ExcelFieldProperty> fieldProperties = new ArrayList<>();
         getAllFields(excelClass).stream()
                 .filter(e -> e.isAnnotationPresent(ExcelField.class))
-                .sorted(Comparator.comparing(e -> e.getAnnotation(ExcelField.class).order()))
                 .forEach(e -> {
                     ExcelField excelField = e.getAnnotation(ExcelField.class);
                     String[] headNameArray = excelField.value();
@@ -70,7 +71,7 @@ public final class BeanUtils {
                             .value(excelField.value())
                             .field(e)
                             .width(excelField.width())
-                            .order(fieldProperties.size())
+                            .index(excelField.index())
                             .format(excelField.format())
                             .color(excelField.color())
                             .fontColor(excelField.fontColor())
@@ -92,7 +93,8 @@ public final class BeanUtils {
                 .collect(Collectors.toMap(e -> {
                     ExcelField excelField = e.getAnnotation(ExcelField.class);
                     String[] headArray = excelField.value();
-                    return headArray[headArray.length - 1] + excelField.title();
+                    return headArray[headArray.length - 1];
+//                    return headArray[headArray.length - 1] + excelField.title();
                 }, f -> f));
     }
 

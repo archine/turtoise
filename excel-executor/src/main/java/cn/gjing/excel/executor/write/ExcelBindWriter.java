@@ -7,6 +7,7 @@ import cn.gjing.excel.base.exception.ExcelException;
 import cn.gjing.excel.base.listener.ExcelListener;
 import cn.gjing.excel.base.listener.write.ExcelWriteListener;
 import cn.gjing.excel.base.meta.ExecMode;
+import cn.gjing.excel.executor.WRMode;
 import cn.gjing.excel.executor.read.ExcelBindReader;
 import cn.gjing.excel.executor.util.BeanUtils;
 import org.springframework.util.StringUtils;
@@ -118,7 +119,7 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
         super.context.setExcelEntity(excelEntity);
         super.context.setBodyHeight(excel.bodyHeight());
         super.context.setHeaderHeight(excel.headerHeight());
-        super.context.setHeaderSeries(super.context.getFieldProperties().get(0).getValue().length);
+        super.context.setHeaderSeries(super.context.getFieldProperties().size() == 0 ? 0 : super.context.getFieldProperties().get(0).getValue().length);
         return this;
     }
 
@@ -198,16 +199,12 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
     }
 
     /**
-     * Set the current write position
+     * Set excel write mode
      *
-     * @param startCol col index, based on 0
-     * @return this
+     * @param mode WRMode
      */
-    public ExcelBindWriter withPosition(int startCol) {
-        if (startCol < 0) {
-            throw new ExcelException("write a column index that cannot be less than 0");
-        }
-        super.writeExecutor.setPosition(startCol);
+    public ExcelBindWriter mode(WRMode mode) {
+        super.writeExecutor.setWriteMode(mode);
         return this;
     }
 }

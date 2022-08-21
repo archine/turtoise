@@ -6,12 +6,16 @@ import cn.gjing.excel.base.context.ExcelWriterContext;
 import cn.gjing.excel.base.exception.ExcelException;
 import cn.gjing.excel.base.listener.write.ExcelWriteListener;
 import cn.gjing.excel.base.meta.ExecMode;
+import cn.gjing.excel.executor.WRMode;
 import cn.gjing.excel.executor.read.ExcelBindReader;
+import cn.gjing.excel.executor.util.BeanUtils;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
 
 /**
  * Excel exports in simple mode, not through mapped entities
@@ -19,6 +23,11 @@ import java.util.List;
  * @author Gjing
  **/
 public final class ExcelSimpleWriter extends ExcelBaseWriter {
+    /**
+     * Field selector
+     * assigns a specified field to an Excel field property
+     */
+    private BiFunction<Integer, List<Field>, Field> fieldSelector;
 
     public ExcelSimpleWriter(ExcelWriterContext context, int windowSize, HttpServletResponse response) {
         super(context, windowSize, response, ExecMode.SIMPLE_WRITE);
@@ -38,7 +47,6 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
         List<ExcelFieldProperty> properties = new ArrayList<>(headNames.length);
         for (String headName : headNames) {
             properties.add(ExcelFieldProperty.builder()
-                    .order(properties.size())
                     .value(new String[]{headName})
                     .build());
         }
@@ -64,7 +72,6 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
         for (String[] headName : headNames) {
             properties.add(ExcelFieldProperty.builder()
                     .value(headName)
-                    .order(properties.size())
                     .build());
         }
         super.context.setHeaderSeries(headNames.get(0).length);
@@ -140,7 +147,7 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      * @param data Sequential padding, which needs to correspond to the header sequence
      * @return this
      */
-    public ExcelSimpleWriter write(List<List<Object>> data) {
+    public ExcelSimpleWriter write(List<?> data) {
         return this.write(data, super.defaultSheetName, true);
     }
 
@@ -151,7 +158,7 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      * @param sheetName sheet name
      * @return this
      */
-    public ExcelSimpleWriter write(List<List<Object>> data, String sheetName) {
+    public ExcelSimpleWriter write(List<?> data, String sheetName) {
         return this.write(data, sheetName, true);
     }
 
@@ -162,7 +169,7 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      * @param needHead need to write the header
      * @return this
      */
-    public ExcelSimpleWriter write(List<List<Object>> data, boolean needHead) {
+    public ExcelSimpleWriter write(List<?> data, boolean needHead) {
         return this.write(data, super.defaultSheetName, needHead);
     }
 
@@ -174,14 +181,35 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      * @param needHead  need to write the header
      * @return this
      */
-    public ExcelSimpleWriter write(List<List<Object>> data, String sheetName, boolean needHead) {
+    public ExcelSimpleWriter write(List<?> data, String sheetName, boolean needHead) {
         super.createSheet(sheetName);
         if (needHead) {
             super.writeExecutor.writeHead();
         }
         if (data != null && !data.isEmpty()) {
+            List<Field> fields = BeanUtils.getAllFields(data.get(0).getClass());
+            for (int i = 0, count = super.context.getFieldProperties().size(); i < count; i++) {
+                if (this.fieldSelector == null) {
+                    super.context.getFieldProperties().get(i).setField(fields.get(i));
+                } else {
+                    super.context.getFieldProperties().get(i).setField(this.fieldSelector.apply(i, fields));
+                }
+            }
             super.writeExecutor.writeBody(data);
         }
+        return this;
+    }
+
+    /**
+     * Field selector that assigns a specified field to an Excel field property
+     *
+     * @param fieldSelector The first parameter is the current Excel field property index（base 0）
+     *                      The second parameter is all fields
+     *                      The third parameter is the field that you return
+     * @return this
+     */
+    public ExcelSimpleWriter fieldSelector(BiFunction<Integer, List<Field>, Field> fieldSelector) {
+        this.fieldSelector = fieldSelector;
         return this;
     }
 
@@ -238,16 +266,12 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
     }
 
     /**
-     * Set the current write position
+     * Set excel write mode
      *
-     * @param startCol col index, based on 0
-     * @return this
+     * @param mode WRMode
      */
-    public ExcelSimpleWriter withPosition(int startCol) {
-        if (startCol < 0) {
-            throw new ExcelException("write a column index that cannot be less than 0");
-        }
-        super.writeExecutor.setPosition(startCol);
+    public ExcelSimpleWriter mode(WRMode mode) {
+        super.writeExecutor.setWriteMode(mode);
         return this;
     }
 }

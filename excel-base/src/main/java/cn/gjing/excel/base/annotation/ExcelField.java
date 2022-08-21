@@ -28,15 +28,6 @@ public @interface ExcelField {
     String[] value() default "";
 
     /**
-     * Specifies the column where the table header resides.
-     * the value can be seen in upper case letters at the top of the table header in Excel files.
-     * used to distinguish table headers with the same name when importing
-     *
-     * @return table header resides
-     */
-    String title() default "";
-
-    /**
      * Header width
      *
      * @return header width, unit (px)
@@ -44,14 +35,11 @@ public @interface ExcelField {
     int width() default 5120;
 
     /**
-     * The table header is set to a sort number, and the Excel executor processes each table header according to the number.
-     * If the current Excel class inherits from the parent class,
-     * all Excel header fields of the parent class are appended to the current Excel header fields before sorting.
-     * If they have the same sequence number, they are sorted according to the order in which the table header fields appear.
+     * Header column index
      *
-     * @return sort index
+     * @return index
      */
-    int order() default 0;
+    short index() default 0;
 
     /**
      * Set the format of all cells below the current Excel table header when exporting.
@@ -62,7 +50,7 @@ public @interface ExcelField {
      * ------- 0.00 is two decimal places
      * ------- yyyy-MM-dd  as 年-月-日
      * }
-     *
+     * <p>
      * See Excel official cell format for more information
      *
      * @return format

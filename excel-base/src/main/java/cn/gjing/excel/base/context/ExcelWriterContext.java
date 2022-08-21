@@ -57,12 +57,6 @@ public final class ExcelWriterContext extends AbstractExcelContext {
     private int headerSeries = 1;
 
     /**
-     * Whether the current export is a template
-     */
-    @Deprecated
-    private boolean isTemplate;
-
-    /**
      * Excel filed properties
      */
     private List<ExcelFieldProperty> fieldProperties;

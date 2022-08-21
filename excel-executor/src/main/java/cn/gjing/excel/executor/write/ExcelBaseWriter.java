@@ -8,11 +8,10 @@ import cn.gjing.excel.base.listener.write.ExcelWriteListener;
 import cn.gjing.excel.base.meta.ExcelInitializerMeta;
 import cn.gjing.excel.base.meta.ExcelType;
 import cn.gjing.excel.base.meta.ExecMode;
-import cn.gjing.excel.base.util.ListenerChain;
-import cn.gjing.excel.base.util.ParamUtils;
+import cn.gjing.excel.executor.util.ListenerChain;
+import cn.gjing.excel.executor.util.ParamUtils;
 import cn.gjing.excel.executor.write.core.ExcelBaseWriteExecutor;
-import cn.gjing.excel.executor.write.core.ExcelBindWriterExecutor;
-import cn.gjing.excel.executor.write.core.ExcelSimpleWriterExecutor;
+import cn.gjing.excel.executor.write.core.ExcelClassWriterExecutor;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -63,7 +62,7 @@ public abstract class ExcelBaseWriter {
                 break;
             default:
         }
-        this.writeExecutor = mode == ExecMode.BIND_WRITE ? new ExcelBindWriterExecutor(context) : new ExcelSimpleWriterExecutor(context);
+        this.writeExecutor = new ExcelClassWriterExecutor(context);
     }
 
     /**
