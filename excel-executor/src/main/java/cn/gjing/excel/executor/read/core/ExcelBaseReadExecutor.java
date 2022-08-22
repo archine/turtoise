@@ -3,19 +3,14 @@ package cn.gjing.excel.executor.read.core;
 import cn.gjing.excel.base.context.ExcelReaderContext;
 import cn.gjing.excel.base.exception.ExcelException;
 import cn.gjing.excel.base.exception.ExcelTemplateException;
-import cn.gjing.excel.base.listener.ExcelListener;
 import cn.gjing.excel.base.meta.RowType;
-import cn.gjing.excel.executor.read.FormulaReader;
+import cn.gjing.excel.base.util.ExcelUtils;
+import cn.gjing.excel.base.util.ParamUtils;
 import cn.gjing.excel.executor.util.ListenerChain;
-import cn.gjing.excel.executor.util.ParamUtils;
 import com.monitorjbl.xlsx.impl.StreamingWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-
-import java.lang.reflect.Field;
-import java.util.List;
 
 /**
  * Excel base reader executor
@@ -25,29 +20,9 @@ import java.util.List;
 public abstract class ExcelBaseReadExecutor<R> {
     protected final ExcelReaderContext<R> context;
     protected boolean saveCurrentRowObj;
-    protected int startCol;
-    protected FormulaReader formulaReader;
 
     public ExcelBaseReadExecutor(ExcelReaderContext<R> context) {
         this.context = context;
-    }
-
-    /**
-     * Sets the location where data is to be written
-     *
-     * @param startCol column index
-     */
-    public void setPosition(int startCol) {
-        this.startCol = startCol;
-    }
-
-    /**
-     * Set the formula reader
-     *
-     * @param formulaReader FormulaReader
-     */
-    public void setFormulaReader(FormulaReader formulaReader) {
-        this.formulaReader = formulaReader;
     }
 
     /**
@@ -61,38 +36,30 @@ public abstract class ExcelBaseReadExecutor<R> {
     /**
      * Read head row
      *
-     * @param rowReadListeners Row read listener
      * @param row              Current row
      * @return Continue read next row
      */
-    protected boolean readHeader(List<ExcelListener> rowReadListeners, Row row) {
+    protected boolean readHeader(Row row) {
         for (Cell cell : row) {
-            if (cell.getColumnIndex() < this.startCol) {
-                continue;
-            }
-            String value = cell.getStringCellValue();
-            if (ParamUtils.contains(this.context.getIgnores(), value)) {
-                value = "ignored";
-            }
-            this.context.getHeadNames().add(String.valueOf(ListenerChain.doReadCell(rowReadListeners, value, cell, row.getRowNum(), cell.getColumnIndex(), RowType.HEAD)));
+            Object value = this.getValue(null, cell, true, false);
+            this.context.getHeadNames().add(ListenerChain.doReadCell(this.context.getListenerCache(), value, cell, row.getRowNum(), cell.getColumnIndex(), RowType.HEAD));
         }
-        return ListenerChain.doReadRow(rowReadListeners, null, row, RowType.HEAD);
+        return ListenerChain.doReadRow(this.context.getListenerCache(), null, row, RowType.HEAD);
     }
 
     /**
      * Reads all rows before the table header
      *
-     * @param rowReadListeners Row read listener
      * @param row              Current row
      * @return Continue read next row
      */
-    protected boolean readOther(List<ExcelListener> rowReadListeners, Row row) {
+    protected boolean readOther(Row row) {
         if (this.context.isReadOther()) {
             for (Cell cell : row) {
-                Object value = this.getValue(null, cell, null, false, false, RowType.OTHER);
-                ListenerChain.doReadCell(rowReadListeners, value, cell, row.getRowNum(), cell.getColumnIndex(), RowType.OTHER);
+                Object value = this.getValue(null, cell, false, false);
+                ListenerChain.doReadCell(this.context.getListenerCache(), value, cell, row.getRowNum(), cell.getColumnIndex(), RowType.OTHER);
             }
-            return ListenerChain.doReadRow(rowReadListeners, null, row, RowType.OTHER);
+            return ListenerChain.doReadRow(this.context.getListenerCache(), null, row, RowType.OTHER);
         }
         return true;
     }
@@ -140,37 +107,16 @@ public abstract class ExcelBaseReadExecutor<R> {
      * @param cell     cell
      * @param trim     Remove white space on both sides of the string
      * @param required Cell content required
-     * @param field    Current field
      * @param r        Current row generated row
-     * @param rowType  rowType Current row type
      * @return value
      */
-    protected Object getValue(R r, Cell cell, Field field, boolean trim, boolean required, RowType rowType) {
-        switch (cell.getCellType()) {
-            case _NONE:
-            case BLANK:
-            case ERROR:
-                if (rowType == RowType.BODY) {
-                    if (required) {
-                        this.saveCurrentRowObj = ListenerChain.doReadEmpty(this.context.getListenerCache(), r, cell.getRowIndex(), cell.getColumnIndex());
-                    }
-                }
-                break;
-            case BOOLEAN:
-                return cell.getBooleanCellValue();
-            case NUMERIC:
-                if (DateUtil.isCellDateFormatted(cell)) {
-                    return cell.getDateCellValue();
-                }
-                return cell.getNumericCellValue();
-            case FORMULA:
-                if (formulaReader == null) {
-                    throw new ExcelException("The current Excel file has cells of formula type, so you need to set the formula reader");
-                }
-                return this.formulaReader.read(cell, field, rowType);
-            default:
-                return trim ? cell.getStringCellValue().trim() : cell.getStringCellValue();
+    protected Object getValue(R r, Cell cell, boolean trim, boolean required) {
+        Object cellValue = ExcelUtils.getCellValue(cell, cell.getCellType(), trim);
+        if (cellValue == null) {
+            if (required) {
+                this.saveCurrentRowObj = ListenerChain.doReadEmpty(this.context.getListenerCache(), r, cell.getRowIndex(), cell.getColumnIndex());
+            }
         }
-        return null;
+        return cellValue;
     }
 }

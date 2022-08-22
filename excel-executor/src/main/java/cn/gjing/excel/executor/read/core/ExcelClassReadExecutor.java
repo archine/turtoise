@@ -1,18 +1,18 @@
 package cn.gjing.excel.executor.read.core;
 
+import cn.gjing.excel.base.ExcelFieldProperty;
 import cn.gjing.excel.base.annotation.ExcelAssert;
 import cn.gjing.excel.base.annotation.ExcelDataConvert;
 import cn.gjing.excel.base.annotation.ExcelField;
 import cn.gjing.excel.base.context.ExcelReaderContext;
 import cn.gjing.excel.base.exception.ExcelAssertException;
 import cn.gjing.excel.base.exception.ExcelException;
-import cn.gjing.excel.base.listener.ExcelListener;
 import cn.gjing.excel.base.meta.ELMeta;
 import cn.gjing.excel.base.meta.RowType;
+import cn.gjing.excel.base.meta.WRMode;
 import cn.gjing.excel.executor.util.BeanUtils;
 import cn.gjing.excel.executor.util.JsonUtils;
 import cn.gjing.excel.executor.util.ListenerChain;
-import cn.gjing.excel.executor.util.ParamUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.springframework.expression.EvaluationContext;
@@ -27,13 +27,14 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Excel bind mode import executor
+ * Import data to generate the specified class object.
+ * Each row of data corresponds to an object
  *
  * @author Gjing
  **/
-public class ExcelBindReadExecutor<R> extends ExcelBaseReadExecutor<R> {
+public class ExcelClassReadExecutor<R> extends ExcelBaseReadExecutor<R> {
 
-    public ExcelBindReadExecutor(ExcelReaderContext<R> context) {
+    public ExcelClassReadExecutor(ExcelReaderContext<R> context) {
         super(context);
     }
 
@@ -41,7 +42,7 @@ public class ExcelBindReadExecutor<R> extends ExcelBaseReadExecutor<R> {
     public void read(int headerIndex, String sheetName) {
         super.validTemplate();
         super.checkSheet(sheetName);
-        this.reader(headerIndex, super.context.getResultReadListener() == null ? null : new ArrayList<>(), super.context.getListenerCache(), new StandardEvaluationContext());
+        this.reader(headerIndex, super.context.getResultReadListener() == null ? null : new ArrayList<>(), new StandardEvaluationContext());
     }
 
     /**
@@ -50,23 +51,21 @@ public class ExcelBindReadExecutor<R> extends ExcelBaseReadExecutor<R> {
      * @param headerIndex Excel header index
      * @param dataList    All data
      */
-    private void reader(int headerIndex, List<R> dataList, List<ExcelListener> rowReadListeners, EvaluationContext context) {
+    private void reader(int headerIndex, List<R> dataList, EvaluationContext context) {
         R r;
         boolean continueRead = true;
-        ListenerChain.doReadBefore(rowReadListeners);
-        int rowNum;
-        int colNum;
+        ListenerChain.doReadBefore(super.context.getListenerCache());
         for (Row row : super.context.getSheet()) {
             if (!continueRead) {
                 break;
             }
-            rowNum = row.getRowNum();
+            int rowNum = row.getRowNum();
             if (rowNum < headerIndex) {
-                continueRead = super.readOther(rowReadListeners, row);
+                continueRead = super.readOther(row);
                 continue;
             }
             if (rowNum == headerIndex) {
-                continueRead = super.readHeader(rowReadListeners, row);
+                continueRead = super.readHeader(row);
                 continue;
             }
             super.saveCurrentRowObj = true;
@@ -76,31 +75,21 @@ public class ExcelBindReadExecutor<R> extends ExcelBaseReadExecutor<R> {
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new ExcelException("Excel entity init failure, " + e.getMessage());
             }
-            for (int c = 0, size = super.context.getHeadNames().size(); c < size; c++) {
-                String head = super.context.getHeadNames().get(c);
-                if ("ignored".equals(head)) {
-                    continue;
-                }
-                colNum = super.startCol + c;
-                Field field = super.context.getExcelFieldMap().get(head);
-                if (field == null) {
-                    field = super.context.getExcelFieldMap().get(head + ParamUtils.numberToEn(colNum));
-                }
-                if (field == null) {
-                    continue;
-                }
-                ExcelField excelField = field.getAnnotation(ExcelField.class);
+            for (int fieldIndex = 0, size = super.context.getFieldProperties().size(); fieldIndex < size; fieldIndex++) {
+                ExcelFieldProperty property = this.context.getFieldProperties().get(fieldIndex);
+                int colNum = super.context.getWrMode() == WRMode.INDEX ? property.getIndex() : fieldIndex;
+                ExcelField excelField = property.getField().getAnnotation(ExcelField.class);
                 Cell valueCell = row.getCell(colNum);
                 Object value;
                 if (valueCell != null) {
-                    value = super.getValue(r, valueCell, field, excelField.trim(), excelField.required(), RowType.BODY);
+                    value = super.getValue(r, valueCell, excelField.trim(), excelField.required());
                     if (!super.saveCurrentRowObj) {
                         break;
                     }
-                    context.setVariable(field.getName(), value);
-                    this.assertValue(context, row, colNum, field, excelField);
-                    value = this.convert(value, context, field.getAnnotation(ExcelDataConvert.class));
-                    value = ListenerChain.doReadCell(rowReadListeners, value, valueCell, rowNum, colNum, RowType.BODY);
+                    context.setVariable(property.getField().getName(), value);
+                    this.assertValue(context, row, colNum, property.getField(), excelField);
+                    value = this.convert(value, context, property.getField().getAnnotation(ExcelDataConvert.class));
+                    value = ListenerChain.doReadCell(super.context.getListenerCache(), value, valueCell, rowNum, colNum, RowType.BODY);
                 } else {
                     if (excelField.required()) {
                         super.saveCurrentRowObj = ListenerChain.doReadEmpty(this.context.getListenerCache(), r, rowNum, colNum);
@@ -108,24 +97,24 @@ public class ExcelBindReadExecutor<R> extends ExcelBaseReadExecutor<R> {
                             break;
                         }
                     }
-                    context.setVariable(field.getName(), null);
-                    this.assertValue(context, row, c, field, excelField);
-                    value = this.convert(null, context, field.getAnnotation(ExcelDataConvert.class));
-                    value = ListenerChain.doReadCell(rowReadListeners, value, null, rowNum, colNum, RowType.BODY);
+                    context.setVariable(property.getField().getName(), null);
+                    this.assertValue(context, row, colNum, property.getField(), excelField);
+                    value = this.convert(null, context, property.getField().getAnnotation(ExcelDataConvert.class));
+                    value = ListenerChain.doReadCell(super.context.getListenerCache(), value, null, rowNum, colNum, RowType.BODY);
                 }
                 if (value != null) {
-                    this.setValue(r, field, value, rowNum, colNum);
+                    this.setValue(r, property.getField(), value, rowNum, colNum);
                 }
-                context.setVariable(field.getName(), value);
+                context.setVariable(property.getField().getName(), value);
             }
             if (super.saveCurrentRowObj) {
-                continueRead = ListenerChain.doReadRow(rowReadListeners, r, row, RowType.BODY);
+                continueRead = ListenerChain.doReadRow(super.context.getListenerCache(), r, row, RowType.BODY);
                 if (dataList != null) {
                     dataList.add(r);
                 }
             }
         }
-        ListenerChain.doReadFinish(rowReadListeners);
+        ListenerChain.doReadFinish(super.context.getListenerCache());
         if (this.context.getResultReadListener() != null) {
             this.context.getResultReadListener().notify(dataList);
         }
@@ -141,7 +130,7 @@ public class ExcelBindReadExecutor<R> extends ExcelBaseReadExecutor<R> {
      */
     private Object convert(Object value, EvaluationContext context, ExcelDataConvert excelDataConvert) {
         if (excelDataConvert != null && !"".equals(excelDataConvert.readExpr())) {
-            return ELMeta.PARSER.getParser().parseExpression(excelDataConvert.readExpr()).getValue(context);
+            return ELMeta.PARSER.parse(excelDataConvert.readExpr(), context);
         }
         return value;
     }
@@ -170,7 +159,7 @@ public class ExcelBindReadExecutor<R> extends ExcelBaseReadExecutor<R> {
                 BeanUtils.setFieldValue(o, field, LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.systemDefault()));
                 return;
             }
-            throw new ExcelException("Unsupported data type, the current cell" + "[row:" + rowIndex + ",column:" + colIndex + "]" + " value type is " + value.getClass().getTypeName() + ", but " + field.getName() + " is " + field.getType().getTypeName());
+            throw new ExcelException("unsupported data type, the current cell" + "[row:" + rowIndex + ",column:" + colIndex + "]" + " value type is " + value.getClass().getTypeName() + ", but " + field.getName() + " is " + field.getType().getTypeName());
         }
     }
 
@@ -186,7 +175,7 @@ public class ExcelBindReadExecutor<R> extends ExcelBaseReadExecutor<R> {
     private void assertValue(EvaluationContext context, Row row, int colIndex, Field field, ExcelField excelField) {
         ExcelAssert excelAssert = field.getAnnotation(ExcelAssert.class);
         if (excelAssert != null) {
-            Boolean test = ELMeta.PARSER.getParser().parseExpression(excelAssert.expr()).getValue(context, Boolean.class);
+            Boolean test = ELMeta.PARSER.parse(excelAssert.expr(), context, Boolean.class);
             if (test != null && !test) {
                 throw new ExcelAssertException(excelAssert.message(), excelField, field, row.getRowNum(), colIndex);
             }

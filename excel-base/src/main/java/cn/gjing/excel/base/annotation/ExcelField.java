@@ -39,7 +39,7 @@ public @interface ExcelField {
      *
      * @return index
      */
-    short index() default 0;
+    int index() default 0;
 
     /**
      * Set the format of all cells below the current Excel table header when exporting.

@@ -1,4 +1,4 @@
-package cn.gjing.excel.executor.util;
+package cn.gjing.excel.base.util;
 
 import cn.gjing.excel.base.meta.ExcelType;
 import org.apache.poi.common.usermodel.HyperlinkType;
@@ -39,6 +39,10 @@ public final class ExcelUtils {
             cell.setCellValue((Date) value);
             return;
         }
+        if (value instanceof Boolean) {
+            cell.setCellValue((Boolean) value);
+            return;
+        }
         if (value instanceof LocalDateTime) {
             cell.setCellValue((LocalDateTime) value);
             return;
@@ -52,6 +56,35 @@ public final class ExcelUtils {
             return;
         }
         throw new IllegalArgumentException("Unsupported data type, you can use a data converter " + value);
+    }
+
+    /**
+     * Get cell value
+     *
+     * @param cell     Current cell
+     * @param cellType Current cell type
+     * @param trim     Returns a string whose value is this string, with any leading and trailing whitespace removed.
+     * @return cell value
+     */
+    public static Object getCellValue(Cell cell, CellType cellType, boolean trim) {
+        switch (cellType) {
+            case _NONE:
+            case BLANK:
+            case ERROR:
+                break;
+            case BOOLEAN:
+                return cell.getBooleanCellValue();
+            case NUMERIC:
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    return cell.getDateCellValue();
+                }
+                return cell.getNumericCellValue();
+            case FORMULA:
+                return getCellValue(cell, cell.getCachedFormulaResultType(), trim);
+            default:
+                return trim ? cell.getStringCellValue().trim() : cell.getStringCellValue();
+        }
+        return null;
     }
 
     /**

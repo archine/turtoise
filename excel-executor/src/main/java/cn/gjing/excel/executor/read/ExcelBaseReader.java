@@ -10,8 +10,7 @@ import cn.gjing.excel.base.meta.ExcelType;
 import cn.gjing.excel.base.meta.ExecMode;
 import cn.gjing.excel.base.meta.ExcelInitializerMeta;
 import cn.gjing.excel.executor.read.core.ExcelBaseReadExecutor;
-import cn.gjing.excel.executor.read.core.ExcelBindReadExecutor;
-import cn.gjing.excel.executor.read.core.ExcelSimpleReadExecutor;
+import cn.gjing.excel.executor.read.core.ExcelClassReadExecutor;
 import com.monitorjbl.xlsx.StreamingReader;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException;
@@ -79,9 +78,9 @@ public abstract class ExcelBaseReader<R> {
                 this.context.setWorkbook(workbook);
                 break;
             default:
-                throw new ExcelException("Excel type cannot be null");
+                throw new ExcelException("Excel type invalid");
         }
-        this.baseReadExecutor = execMode == ExecMode.BIND_READ ? new ExcelBindReadExecutor<>(this.context) : new ExcelSimpleReadExecutor<>(this.context);
+        this.baseReadExecutor = new ExcelClassReadExecutor<>(this.context);
     }
 
     @SuppressWarnings("unchecked")

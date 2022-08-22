@@ -4,25 +4,25 @@ import cn.gjing.excel.base.context.ExcelReaderContext;
 import cn.gjing.excel.base.exception.ExcelException;
 import cn.gjing.excel.base.exception.ExcelTemplateException;
 import cn.gjing.excel.base.listener.read.ExcelReadListener;
-import cn.gjing.excel.base.listener.read.ExcelRowReadListener;
+import cn.gjing.excel.base.listener.read.ExcelResultReadListener;
 import cn.gjing.excel.base.meta.ExcelType;
 import cn.gjing.excel.base.meta.ExecMode;
+import cn.gjing.excel.base.meta.WRMode;
 import org.springframework.util.StringUtils;
 
 import java.io.InputStream;
 import java.util.List;
 
 /**
- * Excel simple mode reader
- * No mapping entities need to be provided.
- * Instead of automatically turning each row into a Java entity,
- * you can manually assemble your own objects in {@link ExcelRowReadListener}
+ * Excel bind mode reader
+ * The reader needs a mapping entity to correspond to it,
+ * Automatically convert the data for each row to the corresponding Java entity
  *
  * @author Gjing
  **/
-public class ExcelSimpleReader<R> extends ExcelBaseReader<R> {
-    public ExcelSimpleReader(ExcelReaderContext<R> context, InputStream inputStream, ExcelType excelType, int cacheRowSize, int bufferSize) {
-        super(context, inputStream, excelType, cacheRowSize, bufferSize, ExecMode.SIMPLE_READ);
+public final class ExcelClassReader<R> extends ExcelBaseReader<R> {
+    public ExcelClassReader(ExcelReaderContext<R> context, InputStream inputStream, ExcelType excelType, int cacheRowSize, int bufferSize) {
+        super(context, inputStream, excelType, cacheRowSize, bufferSize,ExecMode.R_Class);
     }
 
     /**
@@ -31,7 +31,7 @@ public class ExcelSimpleReader<R> extends ExcelBaseReader<R> {
      *
      * @return this
      */
-    public ExcelSimpleReader<R> read() {
+    public ExcelClassReader<R> read() {
         super.baseReadExecutor.read(0, this.defaultSheetName);
         return this;
     }
@@ -43,7 +43,7 @@ public class ExcelSimpleReader<R> extends ExcelBaseReader<R> {
      * @param sheetName sheet name
      * @return this
      */
-    public ExcelSimpleReader<R> read(String sheetName) {
+    public ExcelClassReader<R> read(String sheetName) {
         super.baseReadExecutor.read(0, sheetName);
         return this;
     }
@@ -56,7 +56,7 @@ public class ExcelSimpleReader<R> extends ExcelBaseReader<R> {
      *                    set the subscript of the bottom level of the table header. The index starts at 0
      * @return this
      */
-    public ExcelSimpleReader<R> read(int headerIndex) {
+    public ExcelClassReader<R> read(int headerIndex) {
         super.baseReadExecutor.read(headerIndex, this.defaultSheetName);
         return this;
     }
@@ -69,7 +69,7 @@ public class ExcelSimpleReader<R> extends ExcelBaseReader<R> {
      * @param sheetName   Excel Sheet name
      * @return this
      */
-    public ExcelSimpleReader<R> read(int headerIndex, String sheetName) {
+    public ExcelClassReader<R> read(int headerIndex, String sheetName) {
         super.baseReadExecutor.read(headerIndex, sheetName);
         return this;
     }
@@ -80,8 +80,19 @@ public class ExcelSimpleReader<R> extends ExcelBaseReader<R> {
      * @param need Need
      * @return this
      */
-    public ExcelSimpleReader<R> readOther(boolean need) {
+    public ExcelClassReader<R> readOther(boolean need) {
         super.context.setReadOther(need);
+        return this;
+    }
+
+    /**
+     * Check whether the imported Excel file matches the Excel mapping entity class.
+     * Thrown {@link ExcelTemplateException} if there is don't match.
+     *
+     * @return this
+     **/
+    public ExcelClassReader<R> check() {
+        super.context.setCheckTemplate(true);
         return this;
     }
 
@@ -92,9 +103,9 @@ public class ExcelSimpleReader<R> extends ExcelBaseReader<R> {
      * @param key Unique key
      * @return this
      **/
-    public ExcelSimpleReader<R> check(String key) {
+    public ExcelClassReader<R> check(String key) {
         if (!StringUtils.hasText(key)) {
-            throw new ExcelException("Unique key cannot be empty");
+            throw new ExcelException("unique key cannot be empty");
         }
         super.context.setCheckTemplate(true);
         super.context.setUniqueKey(key);
@@ -107,7 +118,7 @@ public class ExcelSimpleReader<R> extends ExcelBaseReader<R> {
      * @param readListenerList Read listeners
      * @return this
      */
-    public ExcelSimpleReader<R> listener(List<? extends ExcelReadListener> readListenerList) {
+    public ExcelClassReader<R> listener(List<? extends ExcelReadListener> readListenerList) {
         if (readListenerList != null) {
             readListenerList.forEach(this::listener);
         }
@@ -120,34 +131,30 @@ public class ExcelSimpleReader<R> extends ExcelBaseReader<R> {
      * @param readListener Read listener
      * @return this
      */
-    public ExcelSimpleReader<R> listener(ExcelReadListener readListener) {
+    public ExcelClassReader<R> listener(ExcelReadListener readListener) {
         super.context.addListener(readListener);
         super.initAware(readListener);
         return this;
     }
 
     /**
-     * Set the current write position
+     * Subscribe to the data after the import is complete
      *
-     * @param startCol col index, based on 0
+     * @param excelResultReadListener resultReadListener
      * @return this
      */
-    public ExcelSimpleReader<R> withPosition(int startCol) {
-        if (startCol < 0) {
-            throw new ExcelException("the column index to start reading cannot be less than 0");
-        }
-        super.baseReadExecutor.setPosition(startCol);
+    public ExcelClassReader<R> subscribe(ExcelResultReadListener<R> excelResultReadListener) {
+        super.context.setResultReadListener(excelResultReadListener);
         return this;
     }
 
     /**
-     * Set the formula reader
+     * Set excel import mode
      *
-     * @param formulaReader FormulaReader
-     * @return this
+     * @param mode WRMode
      */
-    public ExcelSimpleReader<R> setFormulaReader(FormulaReader formulaReader) {
-        super.baseReadExecutor.setFormulaReader(formulaReader);
+    public ExcelClassReader<R> mode(WRMode mode) {
+        super.context.setWrMode(mode);
         return this;
     }
 }

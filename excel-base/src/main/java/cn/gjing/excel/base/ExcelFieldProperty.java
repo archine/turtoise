@@ -37,7 +37,7 @@ public class ExcelFieldProperty {
      * Excel header column index
      **/
     @Builder.Default
-    private short index = 0;
+    private int index = 0;
 
     /**
      * Cell format

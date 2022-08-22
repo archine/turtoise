@@ -6,8 +6,8 @@ import cn.gjing.excel.base.context.ExcelWriterContext;
 import cn.gjing.excel.base.exception.ExcelException;
 import cn.gjing.excel.base.meta.ExcelType;
 import cn.gjing.excel.base.meta.RowType;
-import cn.gjing.excel.executor.WRMode;
-import cn.gjing.excel.executor.util.ExcelUtils;
+import cn.gjing.excel.base.meta.WRMode;
+import cn.gjing.excel.base.util.ExcelUtils;
 import cn.gjing.excel.executor.util.ListenerChain;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -27,19 +27,9 @@ import java.util.List;
  **/
 public abstract class ExcelBaseWriteExecutor {
     protected final ExcelWriterContext context;
-    protected WRMode wrMode;
 
     public ExcelBaseWriteExecutor(ExcelWriterContext context) {
         this.context = context;
-    }
-
-    /**
-     * Set excel write mode
-     *
-     * @param mode WRMode
-     */
-    public void setWriteMode(WRMode mode) {
-        this.wrMode = mode;
     }
 
     /**
@@ -92,7 +82,7 @@ public abstract class ExcelBaseWriteExecutor {
             for (int fieldIndex = 0, headSize = this.context.getFieldProperties().size(); fieldIndex < headSize; fieldIndex++) {
                 ExcelFieldProperty property = this.context.getFieldProperties().get(fieldIndex);
                 String headName = property.getValue()[level];
-                short lastCellNum = this.wrMode == WRMode.INDEX ? property.getIndex() : headRow.getLastCellNum();
+                int lastCellNum = this.context.getWrMode() == WRMode.INDEX ? property.getIndex() : headRow.getLastCellNum();
                 Cell headCell = headRow.createCell(lastCellNum == -1 ? 0 : lastCellNum);
                 ListenerChain.doSetHeadStyle(this.context.getListenerCache(), headRow, headCell, property, level);
                 headName = (String) ListenerChain.doAssignmentBefore(this.context.getListenerCache(), this.context.getSheet(), headRow, headCell, property, level, RowType.HEAD, headName);

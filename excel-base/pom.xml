@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>excel-base</artifactId>
-    <version>2022.1.8</version>
+    <version>2022.2.0</version>
     <description>Excel基础包,包含注解、监听器等</description>
 
     <properties>

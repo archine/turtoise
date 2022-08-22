@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>excel-style</artifactId>
-    <version>2022.1.4</version>
+    <version>2022.1.5</version>
     <description>Excel样式</description>
 
     <properties>
@@ -22,7 +22,7 @@
         <dependency>
             <groupId>cn.gjing</groupId>
             <artifactId>excel-base</artifactId>
-            <version>2022.1.7</version>
+            <version>2022.2.0</version>
             <optional>true</optional>
         </dependency>
     </dependencies>

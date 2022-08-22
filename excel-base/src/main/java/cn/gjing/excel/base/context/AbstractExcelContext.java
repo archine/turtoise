@@ -1,6 +1,7 @@
 package cn.gjing.excel.base.context;
 
 import cn.gjing.excel.base.listener.ExcelListener;
+import cn.gjing.excel.base.meta.WRMode;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -28,6 +29,13 @@ public abstract class AbstractExcelContext {
     @Getter
     @Setter
     protected Sheet sheet;
+
+    /**
+     * Import and Export Mode
+     */
+    @Getter
+    @Setter
+    protected WRMode wrMode;
 
     /**
      * Listener cache

@@ -5,9 +5,9 @@ import cn.gjing.excel.base.annotation.ExcelDataConvert;
 import cn.gjing.excel.base.context.ExcelWriterContext;
 import cn.gjing.excel.base.meta.ELMeta;
 import cn.gjing.excel.base.meta.RowType;
-import cn.gjing.excel.executor.WRMode;
+import cn.gjing.excel.base.meta.WRMode;
 import cn.gjing.excel.executor.util.BeanUtils;
-import cn.gjing.excel.executor.util.ExcelUtils;
+import cn.gjing.excel.base.util.ExcelUtils;
 import cn.gjing.excel.executor.util.ListenerChain;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -40,7 +40,7 @@ public class ExcelClassWriterExecutor extends ExcelBaseWriteExecutor {
             for (int fieldIndex = 0, headSize = this.context.getFieldProperties().size(); fieldIndex < headSize; fieldIndex++) {
                 ExcelFieldProperty property = this.context.getFieldProperties().get(fieldIndex);
                 Object value = BeanUtils.getFieldValue(o, property.getField());
-                short lastCellNum = super.wrMode == WRMode.INDEX ? property.getIndex() : valueRow.getLastCellNum();
+                int lastCellNum = super.context.getWrMode() == WRMode.INDEX ? property.getIndex() : valueRow.getLastCellNum();
                 Cell valueCell = valueRow.createCell(lastCellNum == -1 ? 0 : lastCellNum);
                 context.setVariable(property.getField().getName(), value);
                 ListenerChain.doSetBodyStyle(this.context.getListenerCache(), valueRow, valueCell, property, dataIndex);

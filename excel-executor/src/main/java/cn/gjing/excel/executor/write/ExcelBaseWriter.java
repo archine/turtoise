@@ -9,7 +9,7 @@ import cn.gjing.excel.base.meta.ExcelInitializerMeta;
 import cn.gjing.excel.base.meta.ExcelType;
 import cn.gjing.excel.base.meta.ExecMode;
 import cn.gjing.excel.executor.util.ListenerChain;
-import cn.gjing.excel.executor.util.ParamUtils;
+import cn.gjing.excel.base.util.ParamUtils;
 import cn.gjing.excel.executor.write.core.ExcelBaseWriteExecutor;
 import cn.gjing.excel.executor.write.core.ExcelClassWriterExecutor;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;

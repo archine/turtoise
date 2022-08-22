@@ -2,13 +2,12 @@ package cn.gjing.excel.executor.util;
 
 import cn.gjing.excel.base.ExcelFieldProperty;
 import cn.gjing.excel.base.annotation.ExcelField;
+import cn.gjing.excel.base.util.ParamUtils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Bean tools
@@ -81,30 +80,15 @@ public final class BeanUtils {
     }
 
     /**
-     * Generate excel field Map
-     *
-     * @param excelClass Excel mapped entity
-     * @return Excel field map
-     */
-    public static Map<String, Field> getExcelFieldsMap(Class<?> excelClass) {
-        List<Field> fieldList = getAllFields(excelClass);
-        return fieldList.stream()
-                .filter(e -> e.isAnnotationPresent(ExcelField.class))
-                .collect(Collectors.toMap(e -> {
-                    ExcelField excelField = e.getAnnotation(ExcelField.class);
-                    String[] headArray = excelField.value();
-                    return headArray[headArray.length - 1];
-//                    return headArray[headArray.length - 1] + excelField.title();
-                }, f -> f));
-    }
-
-    /**
      * Get all fields of the parent and child classes
      *
      * @param clazz Class
      * @return Field list
      */
     public static List<Field> getAllFields(Class<?> clazz) {
+        if (clazz == null) {
+            return new ArrayList<>();
+        }
         Field[] declaredFields = clazz.getDeclaredFields();
         List<Field> fieldList = new ArrayList<>(Arrays.asList(declaredFields));
         Class<?> superclass = clazz.getSuperclass();
