@@ -34,24 +34,39 @@ public final class ExcelAnyClassWriter extends ExcelBaseWriter {
         super(context, windowSize, response, ExecMode.W_ANY_CLASS);
     }
 
+
     /**
      * Set the Excel single-level header
      * The order attribute of the generated header field is set to the order in which the elements appear in the header array you pass in, starting at 0
      *
-     * @param headNames Excel single-level array of header names
+     * @param headers Excel header properties, supported types are string[], String, ExcelFieldProperties
      * @return this
      */
-    public ExcelAnyClassWriter head(String... headNames) {
-        if (headNames == null || headNames.length == 0) {
-            throw new ExcelException("excel header names cannot be null");
+    public ExcelAnyClassWriter head(Object... headers) {
+        if (headers == null || headers.length == 0) {
+            throw new ExcelException("excel headers cannot be null");
         }
-        List<ExcelFieldProperty> properties = new ArrayList<>(headNames.length);
-        for (String headName : headNames) {
-            properties.add(ExcelFieldProperty.builder()
-                    .value(new String[]{headName})
-                    .build());
+        List<ExcelFieldProperty> properties = new ArrayList<>(headers.length);
+        for (Object header : headers) {
+            if (header instanceof String) {
+                properties.add(ExcelFieldProperty.builder()
+                        .value(new String[]{header.toString()})
+                        .build());
+                continue;
+            }
+            if (header.getClass().isArray()) {
+                properties.add(ExcelFieldProperty.builder()
+                        .value((String[]) header)
+                        .build());
+                continue;
+            }
+            if (header instanceof ExcelFieldProperty) {
+                properties.add((ExcelFieldProperty) header);
+                continue;
+            }
+            throw new IllegalArgumentException("invalid header type,supports string[], ExcelFieldProperties, string");
         }
-        super.context.setHeaderSeries(1);
+        super.context.setHeaderSeries(properties.get(0).getValue().length);
         super.context.setFieldProperties(properties);
         return this;
     }
@@ -60,9 +75,7 @@ public final class ExcelAnyClassWriter extends ExcelBaseWriter {
      * Set the Excel header
      * The order attribute of the generated header field is set to the order in which the elements appear in the header array you pass in, starting at 0
      *
-     * @param headNames Excel header name arrays, According to the first header array
-     *                  size to determine the header hierarchy,
-     *                  the subsequent header array must be the same size as the first
+     * @param headNames Excel header name arrays
      * @return this
      */
     public ExcelAnyClassWriter head(List<String[]> headNames) {
@@ -77,21 +90,6 @@ public final class ExcelAnyClassWriter extends ExcelBaseWriter {
         }
         super.context.setHeaderSeries(headNames.get(0).length);
         super.context.setFieldProperties(properties);
-        return this;
-    }
-
-    /**
-     * Set the Excel property
-     *
-     * @param properties Excel filed property, the ExcelFieldProperty order attribute needs to be configured if it needs to be used in listeners
-     * @return this
-     */
-    public ExcelAnyClassWriter head2(List<ExcelFieldProperty> properties) {
-        if (properties == null || properties.isEmpty()) {
-            throw new ExcelException("excel filed property cannot be null");
-        }
-        super.context.setFieldProperties(properties);
-        super.context.setHeaderSeries(properties.get(0).getValue().length);
         return this;
     }
 
