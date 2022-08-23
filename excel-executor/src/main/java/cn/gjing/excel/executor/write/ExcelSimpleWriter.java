@@ -23,14 +23,14 @@ import java.util.function.BiFunction;
  *
  * @author Gjing
  **/
-public final class ExcelAnyClassWriter extends ExcelBaseWriter {
+public final class ExcelSimpleWriter extends ExcelBaseWriter {
     /**
      * Field selector
      * assigns a specified field to an Excel field property
      */
     private BiFunction<Integer, List<Field>, Field> fieldSelector;
 
-    public ExcelAnyClassWriter(ExcelWriterContext context, int windowSize, HttpServletResponse response) {
+    public ExcelSimpleWriter(ExcelWriterContext context, int windowSize, HttpServletResponse response) {
         super(context, windowSize, response, ExecMode.W_ANY_CLASS);
     }
 
@@ -42,7 +42,7 @@ public final class ExcelAnyClassWriter extends ExcelBaseWriter {
      * @param headers Excel header properties, supported types are string[], String, ExcelFieldProperties
      * @return this
      */
-    public ExcelAnyClassWriter head(Object... headers) {
+    public ExcelSimpleWriter head(Object... headers) {
         if (headers == null || headers.length == 0) {
             throw new ExcelException("excel headers cannot be null");
         }
@@ -54,41 +54,13 @@ public final class ExcelAnyClassWriter extends ExcelBaseWriter {
                         .build());
                 continue;
             }
-            if (header.getClass().isArray()) {
-                properties.add(ExcelFieldProperty.builder()
-                        .value((String[]) header)
-                        .build());
-                continue;
-            }
             if (header instanceof ExcelFieldProperty) {
                 properties.add((ExcelFieldProperty) header);
                 continue;
             }
-            throw new IllegalArgumentException("invalid header type,supports string[], ExcelFieldProperties, string");
+            throw new IllegalArgumentException("invalid header value,supports ExcelFieldProperty, string");
         }
         super.context.setHeaderSeries(properties.get(0).getValue().length);
-        super.context.setFieldProperties(properties);
-        return this;
-    }
-
-    /**
-     * Set the Excel header
-     * The order attribute of the generated header field is set to the order in which the elements appear in the header array you pass in, starting at 0
-     *
-     * @param headNames Excel header name arrays
-     * @return this
-     */
-    public ExcelAnyClassWriter head(List<String[]> headNames) {
-        if (headNames == null || headNames.isEmpty()) {
-            throw new ExcelException("excel header names cannot be null");
-        }
-        List<ExcelFieldProperty> properties = new ArrayList<>(headNames.size());
-        for (String[] headName : headNames) {
-            properties.add(ExcelFieldProperty.builder()
-                    .value(headName)
-                    .build());
-        }
-        super.context.setHeaderSeries(headNames.get(0).length);
         super.context.setFieldProperties(properties);
         return this;
     }
@@ -99,7 +71,7 @@ public final class ExcelAnyClassWriter extends ExcelBaseWriter {
      * @param rowHeight Row height
      * @return this
      */
-    public ExcelAnyClassWriter headHeight(short rowHeight) {
+    public ExcelSimpleWriter headHeight(short rowHeight) {
         super.context.setHeaderHeight(rowHeight);
         return this;
     }
@@ -110,7 +82,7 @@ public final class ExcelAnyClassWriter extends ExcelBaseWriter {
      * @param rowHeight Row height
      * @return this
      */
-    public ExcelAnyClassWriter bodyHeight(short rowHeight) {
+    public ExcelSimpleWriter bodyHeight(short rowHeight) {
         super.context.setBodyHeight(rowHeight);
         return this;
     }
@@ -121,7 +93,7 @@ public final class ExcelAnyClassWriter extends ExcelBaseWriter {
      * @param bigTitle Big title
      * @return this
      */
-    public ExcelAnyClassWriter writeTitle(BigTitle bigTitle) {
+    public ExcelSimpleWriter writeTitle(BigTitle bigTitle) {
         return this.writeTitle(bigTitle, super.defaultSheetName);
     }
 
@@ -132,7 +104,7 @@ public final class ExcelAnyClassWriter extends ExcelBaseWriter {
      * @param sheetName Sheet name
      * @return this
      */
-    public ExcelAnyClassWriter writeTitle(BigTitle bigTitle, String sheetName) {
+    public ExcelSimpleWriter writeTitle(BigTitle bigTitle, String sheetName) {
         if (bigTitle != null) {
             super.createSheet(sheetName);
             super.writeExecutor.writeTitle(bigTitle);
@@ -146,7 +118,7 @@ public final class ExcelAnyClassWriter extends ExcelBaseWriter {
      * @param data Sequential padding, which needs to correspond to the header sequence
      * @return this
      */
-    public ExcelAnyClassWriter write(List<?> data) {
+    public ExcelSimpleWriter write(List<?> data) {
         return this.write(data, super.defaultSheetName, true);
     }
 
@@ -157,7 +129,7 @@ public final class ExcelAnyClassWriter extends ExcelBaseWriter {
      * @param sheetName sheet name
      * @return this
      */
-    public ExcelAnyClassWriter write(List<?> data, String sheetName) {
+    public ExcelSimpleWriter write(List<?> data, String sheetName) {
         return this.write(data, sheetName, true);
     }
 
@@ -168,7 +140,7 @@ public final class ExcelAnyClassWriter extends ExcelBaseWriter {
      * @param needHead need to write the header
      * @return this
      */
-    public ExcelAnyClassWriter write(List<?> data, boolean needHead) {
+    public ExcelSimpleWriter write(List<?> data, boolean needHead) {
         return this.write(data, super.defaultSheetName, needHead);
     }
 
@@ -180,7 +152,7 @@ public final class ExcelAnyClassWriter extends ExcelBaseWriter {
      * @param needHead  need to write the header
      * @return this
      */
-    public ExcelAnyClassWriter write(List<?> data, String sheetName, boolean needHead) {
+    public ExcelSimpleWriter write(List<?> data, String sheetName, boolean needHead) {
         super.createSheet(sheetName);
         if (needHead) {
             super.writeExecutor.writeHead();
@@ -207,7 +179,7 @@ public final class ExcelAnyClassWriter extends ExcelBaseWriter {
      *                      The third parameter is the field that you return
      * @return this
      */
-    public ExcelAnyClassWriter fieldSelector(BiFunction<Integer, List<Field>, Field> fieldSelector) {
+    public ExcelSimpleWriter fieldSelector(BiFunction<Integer, List<Field>, Field> fieldSelector) {
         this.fieldSelector = fieldSelector;
         return this;
     }
@@ -218,7 +190,7 @@ public final class ExcelAnyClassWriter extends ExcelBaseWriter {
      * @param listener Write listener
      * @return this
      */
-    public ExcelAnyClassWriter listener(ExcelWriteListener listener) {
+    public ExcelSimpleWriter listener(ExcelWriteListener listener) {
         super.context.addListener(listener);
         super.initAware(listener);
         return this;
@@ -230,7 +202,7 @@ public final class ExcelAnyClassWriter extends ExcelBaseWriter {
      * @param listeners Write listener list
      * @return this
      */
-    public ExcelAnyClassWriter listener(List<? extends ExcelWriteListener> listeners) {
+    public ExcelSimpleWriter listener(List<? extends ExcelWriteListener> listeners) {
         if (listeners != null) {
             listeners.forEach(this::listener);
         }
@@ -241,15 +213,15 @@ public final class ExcelAnyClassWriter extends ExcelBaseWriter {
      * Bind the exported Excel file to the currently set unique key,
      * Can be used to {@link ExcelClassReader#check} for a match with an entity class when a file is imported.
      *
-     * @param key Unique key ,Each exported file recommends that the key be set to be unique.
-     *            If empty, the binding is invalid
+     * @param idCard Each exported file recommends that the key be set to be unique.
+     *               If empty, the binding is invalid
      * @return this
      */
-    public ExcelAnyClassWriter bind(String key) {
-        if (!StringUtils.hasText(key)) {
-            throw new ExcelException("Unique key cannot be empty");
+    public ExcelSimpleWriter bind(String idCard) {
+        if (!StringUtils.hasText(idCard)) {
+            throw new ExcelException("idCard cannot be empty");
         }
-        super.context.setUniqueKey(key);
+        super.context.setIdCard(idCard);
         super.context.setBind(true);
         return this;
     }
@@ -259,7 +231,7 @@ public final class ExcelAnyClassWriter extends ExcelBaseWriter {
      *
      * @return this
      */
-    public ExcelAnyClassWriter unbind() {
+    public ExcelSimpleWriter unbind() {
         super.context.setBind(false);
         return this;
     }
@@ -269,7 +241,7 @@ public final class ExcelAnyClassWriter extends ExcelBaseWriter {
      *
      * @param mode WRMode
      */
-    public ExcelAnyClassWriter mode(WRMode mode) {
+    public ExcelSimpleWriter mode(WRMode mode) {
         super.context.setWrMode(mode);
         return this;
     }

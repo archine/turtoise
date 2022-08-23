@@ -23,9 +23,9 @@ import java.util.function.Predicate;
  *
  * @author Gjing
  **/
-public final class ExcelFixedClassWriter extends ExcelBaseWriter {
+public final class ExcelBindWriter extends ExcelBaseWriter {
 
-    public ExcelFixedClassWriter(ExcelWriterContext context, Excel excel, HttpServletResponse response) {
+    public ExcelBindWriter(ExcelWriterContext context, Excel excel, HttpServletResponse response) {
         super(context, excel.windowSize(), response, ExecMode.W_FIXED_CLASS);
     }
 
@@ -35,7 +35,7 @@ public final class ExcelFixedClassWriter extends ExcelBaseWriter {
      * @param data data
      * @return this
      */
-    public ExcelFixedClassWriter write(List<?> data) {
+    public ExcelBindWriter write(List<?> data) {
         return this.write(data, super.defaultSheetName, true);
     }
 
@@ -46,7 +46,7 @@ public final class ExcelFixedClassWriter extends ExcelBaseWriter {
      * @param sheetName sheet name
      * @return this
      */
-    public ExcelFixedClassWriter write(List<?> data, String sheetName) {
+    public ExcelBindWriter write(List<?> data, String sheetName) {
         return this.write(data, sheetName, true);
     }
 
@@ -57,7 +57,7 @@ public final class ExcelFixedClassWriter extends ExcelBaseWriter {
      * @param needHead need to write the header
      * @return this
      */
-    public ExcelFixedClassWriter write(List<?> data, boolean needHead) {
+    public ExcelBindWriter write(List<?> data, boolean needHead) {
         return this.write(data, super.defaultSheetName, needHead);
     }
 
@@ -69,7 +69,7 @@ public final class ExcelFixedClassWriter extends ExcelBaseWriter {
      * @param needHead  need to write the header
      * @return this
      */
-    public ExcelFixedClassWriter write(List<?> data, String sheetName, boolean needHead) {
+    public ExcelBindWriter write(List<?> data, String sheetName, boolean needHead) {
         super.createSheet(sheetName);
         if (needHead) {
             super.writeExecutor.writeHead();
@@ -86,7 +86,7 @@ public final class ExcelFixedClassWriter extends ExcelBaseWriter {
      * @param bigTitle Big title
      * @return this
      */
-    public ExcelFixedClassWriter writeTitle(BigTitle bigTitle) {
+    public ExcelBindWriter writeTitle(BigTitle bigTitle) {
         return this.writeTitle(bigTitle, super.defaultSheetName);
     }
 
@@ -97,7 +97,7 @@ public final class ExcelFixedClassWriter extends ExcelBaseWriter {
      * @param sheetName Sheet name
      * @return this
      */
-    public ExcelFixedClassWriter writeTitle(BigTitle bigTitle, String sheetName) {
+    public ExcelBindWriter writeTitle(BigTitle bigTitle, String sheetName) {
         if (bigTitle != null) {
             super.createSheet(sheetName);
             super.writeExecutor.writeTitle(bigTitle);
@@ -112,7 +112,7 @@ public final class ExcelFixedClassWriter extends ExcelBaseWriter {
      * @param ignores     The exported field is to be ignored
      * @return this
      */
-    public ExcelFixedClassWriter resetEntity(Class<?> excelEntity, String... ignores) {
+    public ExcelBindWriter resetEntity(Class<?> excelEntity, String... ignores) {
         Excel excel = excelEntity.getAnnotation(Excel.class);
         Objects.requireNonNull(excel, "Failed to reset Excel class, the @Excel annotation was not found on the " + excelEntity);
         super.context.setFieldProperties(BeanUtils.getExcelFiledProperties(excelEntity, ignores));
@@ -129,7 +129,7 @@ public final class ExcelFixedClassWriter extends ExcelBaseWriter {
      * @param predicate The assertion condition, true, is removed
      * @return this
      */
-    public ExcelFixedClassWriter resetListeners(Predicate<ExcelListener> predicate) {
+    public ExcelBindWriter resetListeners(Predicate<ExcelListener> predicate) {
         super.context.getListenerCache().removeIf(predicate);
         return this;
     }
@@ -141,7 +141,7 @@ public final class ExcelFixedClassWriter extends ExcelBaseWriter {
      *
      * @return this
      */
-    public ExcelFixedClassWriter resetListeners() {
+    public ExcelBindWriter resetListeners() {
         return this.resetListeners((l) -> true);
     }
 
@@ -149,16 +149,16 @@ public final class ExcelFixedClassWriter extends ExcelBaseWriter {
      * Bind the exported Excel file to the currently set unique key,
      * Can be used to {@link ExcelClassReader#check} for a match with an entity class when a file is imported.
      *
-     * @param key Unique key ,Each exported file recommends that the key be set to be unique.
-     *            Priority is higher than at {@link Excel#uniqueKey()}.
-     *            If empty, the unique key in the annotation is used
+     * @param idCard Excel file id card ,Each exported file recommends that the key be set to be unique.
+     *               Priority is higher than at {@link Excel#idCard()}}.
+     *               If empty, the unique key in the annotation is used
      * @return this
      */
-    public ExcelFixedClassWriter bind(String key) {
-        if (!StringUtils.hasText(key)) {
-            throw new ExcelException("Unique key cannot be empty");
+    public ExcelBindWriter bind(String idCard) {
+        if (!StringUtils.hasText(idCard)) {
+            throw new ExcelException("id card cannot be empty");
         }
-        super.context.setUniqueKey(key);
+        super.context.setIdCard(idCard);
         super.context.setBind(true);
         return this;
     }
@@ -168,7 +168,7 @@ public final class ExcelFixedClassWriter extends ExcelBaseWriter {
      *
      * @return this
      */
-    public ExcelFixedClassWriter unbind() {
+    public ExcelBindWriter unbind() {
         super.context.setBind(false);
         return this;
     }
@@ -179,7 +179,7 @@ public final class ExcelFixedClassWriter extends ExcelBaseWriter {
      * @param listener Write listener
      * @return this
      */
-    public ExcelFixedClassWriter listener(ExcelWriteListener listener) {
+    public ExcelBindWriter listener(ExcelWriteListener listener) {
         super.context.addListener(listener);
         super.initAware(listener);
         return this;
@@ -191,7 +191,7 @@ public final class ExcelFixedClassWriter extends ExcelBaseWriter {
      * @param listeners Write listener list
      * @return this
      */
-    public ExcelFixedClassWriter listener(List<? extends ExcelWriteListener> listeners) {
+    public ExcelBindWriter listener(List<? extends ExcelWriteListener> listeners) {
         if (listeners != null) {
             listeners.forEach(this::listener);
         }
@@ -203,7 +203,7 @@ public final class ExcelFixedClassWriter extends ExcelBaseWriter {
      *
      * @param mode WRMode
      */
-    public ExcelFixedClassWriter mode(WRMode mode) {
+    public ExcelBindWriter mode(WRMode mode) {
         super.context.setWrMode(mode);
         return this;
     }

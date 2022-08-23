@@ -12,6 +12,7 @@ import java.lang.reflect.Field;
  **/
 @Getter
 @Setter
+@ToString
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -56,4 +57,32 @@ public class ExcelFieldProperty {
      */
     @Builder.Default
     private ExcelColor[] fontColor = new ExcelColor[]{ExcelColor.BLACK};
+
+    public static ExcelFieldProperty of(String... value) {
+        return ExcelFieldProperty.builder()
+                .value(value)
+                .build();
+    }
+
+    public static ExcelFieldProperty of(String format, int index, String... value) {
+        return ExcelFieldProperty.builder()
+                .value(value)
+                .index(index)
+                .format(format)
+                .build();
+    }
+
+    public static ExcelFieldProperty of(int index, String... value) {
+        return ExcelFieldProperty.builder()
+                .value(value)
+                .index(index)
+                .build();
+    }
+
+    public static ExcelFieldProperty of(String format, String[] header) {
+        return ExcelFieldProperty.builder()
+                .format(format)
+                .value(header)
+                .build();
+    }
 }

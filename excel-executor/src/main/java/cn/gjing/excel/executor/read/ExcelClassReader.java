@@ -22,7 +22,7 @@ import java.util.List;
  **/
 public final class ExcelClassReader<R> extends ExcelBaseReader<R> {
     public ExcelClassReader(ExcelReaderContext<R> context, InputStream inputStream, ExcelType excelType, int cacheRowSize, int bufferSize) {
-        super(context, inputStream, excelType, cacheRowSize, bufferSize,ExecMode.R_Class);
+        super(context, inputStream, excelType, cacheRowSize, bufferSize, ExecMode.R_Class);
     }
 
     /**
@@ -100,15 +100,15 @@ public final class ExcelClassReader<R> extends ExcelBaseReader<R> {
      * Check whether the imported Excel file matches the Excel mapping entity class.
      * Thrown {@link ExcelTemplateException} if is don't match.
      *
-     * @param key Unique key
+     * @param idCard Excel file id card
      * @return this
      **/
-    public ExcelClassReader<R> check(String key) {
-        if (!StringUtils.hasText(key)) {
-            throw new ExcelException("unique key cannot be empty");
+    public ExcelClassReader<R> check(String idCard) {
+        if (!StringUtils.hasText(idCard)) {
+            throw new ExcelException("idCard cannot be empty");
         }
         super.context.setCheckTemplate(true);
-        super.context.setUniqueKey(key);
+        super.context.setIdCard(idCard);
         return this;
     }
 

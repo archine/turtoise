@@ -92,7 +92,7 @@ public abstract class ExcelBaseReadExecutor<R> {
                 throw new ExcelTemplateException();
             }
             for (Row row : this.context.getWorkbook().getSheet(key)) {
-                if (!ParamUtils.equals(ParamUtils.encodeMd5(this.context.getUniqueKey()), row.getCell(0).getStringCellValue())) {
+                if (!ParamUtils.equals(ParamUtils.encodeMd5(this.context.getIdCard()), row.getCell(0).getStringCellValue())) {
                     throw new ExcelTemplateException();
                 }
                 break;

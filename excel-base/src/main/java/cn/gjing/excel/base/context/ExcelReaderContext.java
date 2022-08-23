@@ -37,9 +37,9 @@ public class ExcelReaderContext<R> extends AbstractExcelContext {
     private boolean readOther = false;
 
     /**
-     * The unique key
+     * The Excel id card
      */
-    private String uniqueKey;
+    private String idCard;
 
     /**
      * Read result listener

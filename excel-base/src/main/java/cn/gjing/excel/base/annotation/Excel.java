@@ -70,10 +70,9 @@ public @interface Excel {
     short bodyHeight() default 390;
 
     /**
-     * Set a unique identifier for the exported file. This identifier can be used for verification during import.
-     * If it is an empty string, no setting is required
+     * Set the ID card for the exported file.
      *
      * @return key
      */
-    String uniqueKey() default "";
+    String idCard() default "";
 }

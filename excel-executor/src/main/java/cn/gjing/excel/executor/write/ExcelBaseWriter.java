@@ -142,7 +142,7 @@ public abstract class ExcelBaseWriter {
         Sheet sheet = this.context.getWorkbook().createSheet(unqSheetName);
         sheet.protectSheet(UUID.randomUUID().toString().replaceAll("-", ""));
         Row row = sheet.createRow(0);
-        row.createCell(0).setCellValue(ParamUtils.encodeMd5(this.context.getUniqueKey()));
+        row.createCell(0).setCellValue(ParamUtils.encodeMd5(this.context.getIdCard()));
         this.context.getWorkbook().setSheetHidden(this.context.getWorkbook().getSheetIndex(sheet), true);
     }
 }

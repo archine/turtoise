@@ -9,8 +9,8 @@ import cn.gjing.excel.base.meta.ExcelType;
 import cn.gjing.excel.base.util.ExcelUtils;
 import cn.gjing.excel.executor.read.ExcelClassReader;
 import cn.gjing.excel.executor.util.BeanUtils;
-import cn.gjing.excel.executor.write.ExcelFixedClassWriter;
-import cn.gjing.excel.executor.write.ExcelAnyClassWriter;
+import cn.gjing.excel.executor.write.ExcelBindWriter;
+import cn.gjing.excel.executor.write.ExcelSimpleWriter;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -43,7 +43,7 @@ public final class ExcelFactory {
      *                    then it is ignored
      * @return ExcelWriter
      */
-    public static ExcelFixedClassWriter createWriter(Class<?> excelEntity, HttpServletResponse response, String... ignores) {
+    public static ExcelBindWriter createWriter(Class<?> excelEntity, HttpServletResponse response, String... ignores) {
         return createWriter(null, excelEntity, response, ignores);
     }
 
@@ -57,7 +57,7 @@ public final class ExcelFactory {
      *                    If it is a parent, all children below it will be ignored as well
      * @return ExcelWriter
      */
-    public static ExcelFixedClassWriter createWriter(String fileName, Class<?> excelEntity, HttpServletResponse response, String... ignores) {
+    public static ExcelBindWriter createWriter(String fileName, Class<?> excelEntity, HttpServletResponse response, String... ignores) {
         Objects.requireNonNull(excelEntity, "Excel mapping class cannot be null");
         Excel excel = excelEntity.getAnnotation(Excel.class);
         Objects.requireNonNull(excel, "@Excel annotation was not found on the " + excelEntity);
@@ -69,31 +69,31 @@ public final class ExcelFactory {
         context.setHeaderHeight(excel.headerHeight());
         context.setHeaderSeries(context.getFieldProperties().size() == 0 ? 0 : context.getFieldProperties().get(0).getValue().length);
         context.setBodyHeight(excel.bodyHeight());
-        context.setUniqueKey("".equals(excel.uniqueKey()) ? excelEntity.getName() : excel.uniqueKey());
-        return new ExcelFixedClassWriter(context, excel, response);
+        context.setIdCard("".equals(excel.idCard()) ? excelEntity.getName() : excel.idCard());
+        return new ExcelBindWriter(context, excel, response);
     }
 
     /**
-     * Create an Excel any class writer
+     * Create an Excel simple writer
      *
      * @param fileName Excel file name
      * @param response response
      * @return ExcelSimpleWriter
      */
-    public static ExcelAnyClassWriter createAnyClassWriter(String fileName, HttpServletResponse response) {
-        return createAnyClassWriter(fileName, response, ExcelType.XLS, 500);
+    public static ExcelSimpleWriter createSimpleWriter(String fileName, HttpServletResponse response) {
+        return createSimpleWriter(fileName, response, ExcelType.XLS, 500);
     }
 
     /**
-     * Create an Excel any class writer
+     * Create an Excel simple writer
      *
      * @param fileName  Excel file name
      * @param response  response
      * @param excelType Excel file type
      * @return ExcelSimpleWriter
      */
-    public static ExcelAnyClassWriter createAnyClassWriter(String fileName, HttpServletResponse response, ExcelType excelType) {
-        return createAnyClassWriter(fileName, response, excelType, 500);
+    public static ExcelSimpleWriter createSimpleWriter(String fileName, HttpServletResponse response, ExcelType excelType) {
+        return createSimpleWriter(fileName, response, excelType, 500);
     }
 
     /**
@@ -107,13 +107,13 @@ public final class ExcelFactory {
      *                   only for xlsx
      * @return ExcelSimpleWriter
      */
-    public static ExcelAnyClassWriter createAnyClassWriter(String fileName, HttpServletResponse response, ExcelType excelType, int windowSize) {
+    public static ExcelSimpleWriter createSimpleWriter(String fileName, HttpServletResponse response, ExcelType excelType, int windowSize) {
         ExcelWriterContext context = new ExcelWriterContext();
         context.setFileName(StringUtils.hasText(fileName) ? fileName : LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         context.setExcelEntity(null);
         context.setExcelType(excelType);
         context.setBind(false);
-        return new ExcelAnyClassWriter(context, windowSize, response);
+        return new ExcelSimpleWriter(context, windowSize, response);
     }
 
     /**
@@ -128,7 +128,7 @@ public final class ExcelFactory {
         try {
             ExcelType excelType = ExcelUtils.getExcelType(file.getOriginalFilename());
             if (excelType == null) {
-                throw new ExcelTemplateException("File type does not belong to Excel");
+                throw new ExcelTemplateException("file type must be excel");
             }
             return createReader(file.getInputStream(), excelClass, excelType);
         } catch (IOException e) {
@@ -148,7 +148,7 @@ public final class ExcelFactory {
         try {
             ExcelType excelType = ExcelUtils.getExcelType(file.getName());
             if (excelType == null) {
-                throw new ExcelTemplateException("File type does not belong to Excel");
+                throw new ExcelTemplateException("file type must be excel");
             }
             return createReader(Files.newInputStream(file.toPath()), excelClass, excelType);
         } catch (IOException e) {
@@ -170,7 +170,7 @@ public final class ExcelFactory {
         Excel excel = excelClass.getAnnotation(Excel.class);
         Objects.requireNonNull(excel, "@Excel annotation was not found on the " + excel);
         ExcelReaderContext<R> readerContext = new ExcelReaderContext<>(excelClass);
-        readerContext.setUniqueKey("".equals(excel.uniqueKey()) ? excelClass.getName() : excel.uniqueKey());
+        readerContext.setIdCard("".equals(excel.idCard()) ? excelClass.getName() : excel.idCard());
         readerContext.setFieldProperties(BeanUtils.getExcelFiledProperties(excelClass, null));
         return new ExcelClassReader<>(readerContext, inputStream, excelType, excel.cacheRow(), excel.bufferSize());
     }

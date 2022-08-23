@@ -32,9 +32,9 @@ public final class ExcelWriterContext extends AbstractExcelContext {
     private boolean bind = true;
 
     /**
-     * The unique key
+     * The Excel file id card
      */
-    private String uniqueKey;
+    private String idCard;
 
     /**
      * Excel type
