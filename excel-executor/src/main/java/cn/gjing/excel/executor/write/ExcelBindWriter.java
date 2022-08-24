@@ -26,7 +26,7 @@ import java.util.function.Predicate;
 public final class ExcelBindWriter extends ExcelBaseWriter {
 
     public ExcelBindWriter(ExcelWriterContext context, Excel excel, HttpServletResponse response) {
-        super(context, excel.windowSize(), response, ExecMode.W_FIXED_CLASS);
+        super(context, excel.windowSize(), response, ExecMode.W_BIND);
     }
 
     /**

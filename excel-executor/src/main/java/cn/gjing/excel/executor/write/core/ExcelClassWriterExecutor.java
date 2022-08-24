@@ -63,7 +63,7 @@ public class ExcelClassWriterExecutor extends ExcelBaseWriteExecutor {
      */
     private Object convert(Object value, ExcelDataConvert excelDataConvert, EvaluationContext context) {
         if (excelDataConvert != null && !"".equals(excelDataConvert.writeExpr())) {
-            return ELMeta.PARSER.getParser().parseExpression(excelDataConvert.writeExpr()).getValue(context);
+            return ELMeta.PARSER.parse(excelDataConvert.writeExpr(), context);
         }
         return value;
     }

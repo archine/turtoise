@@ -31,7 +31,7 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
     private BiFunction<Integer, List<Field>, Field> fieldSelector;
 
     public ExcelSimpleWriter(ExcelWriterContext context, int windowSize, HttpServletResponse response) {
-        super(context, windowSize, response, ExecMode.W_ANY_CLASS);
+        super(context, windowSize, response, ExecMode.W_SIMPLE);
     }
 
 
@@ -240,6 +240,7 @@ public final class ExcelSimpleWriter extends ExcelBaseWriter {
      * Set excel write mode
      *
      * @param mode WRMode
+     * @return this
      */
     public ExcelSimpleWriter mode(WRMode mode) {
         super.context.setWrMode(mode);

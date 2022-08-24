@@ -7,15 +7,15 @@ package cn.gjing.excel.base.meta;
  **/
 public enum ExecMode {
     /**
-     * Fixed class export
+     * Bind export
      */
-    W_FIXED_CLASS,
+    W_BIND,
     /**
-     * Any class export
+     * Simple export
      */
-    W_ANY_CLASS,
+    W_SIMPLE,
     /**
      * Import and generate corresponding class objects
      */
-    R_Class
+    R_CLASS
 }

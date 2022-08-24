@@ -14,15 +14,13 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
- * Excel bind mode reader
- * The reader needs a mapping entity to correspond to it,
- * Automatically convert the data for each row to the corresponding Java entity
+ * Class reading mode to generate objects for each row in the Excel file
  *
  * @author Gjing
  **/
 public final class ExcelClassReader<R> extends ExcelBaseReader<R> {
     public ExcelClassReader(ExcelReaderContext<R> context, InputStream inputStream, ExcelType excelType, int cacheRowSize, int bufferSize) {
-        super(context, inputStream, excelType, cacheRowSize, bufferSize, ExecMode.R_Class);
+        super(context, inputStream, excelType, cacheRowSize, bufferSize, ExecMode.R_CLASS);
     }
 
     /**
