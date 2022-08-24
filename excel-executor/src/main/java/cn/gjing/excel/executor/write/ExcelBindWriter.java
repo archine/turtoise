@@ -202,6 +202,7 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
      * Set excel write mode
      *
      * @param mode WRMode
+     * @return this
      */
     public ExcelBindWriter mode(WRMode mode) {
         super.context.setWrMode(mode);

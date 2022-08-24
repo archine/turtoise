@@ -150,6 +150,7 @@ public final class ExcelClassReader<R> extends ExcelBaseReader<R> {
      * Set excel import mode
      *
      * @param mode WRMode
+     * @return this
      */
     public ExcelClassReader<R> mode(WRMode mode) {
         super.context.setWrMode(mode);
