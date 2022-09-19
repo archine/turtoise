@@ -113,6 +113,7 @@ public final class ExcelFactory {
         context.setExcelEntity(null);
         context.setExcelType(excelType);
         context.setBind(false);
+        context.setHeaderSeries(0);
         return new ExcelSimpleWriter(context, windowSize, response);
     }
 
@@ -172,6 +173,6 @@ public final class ExcelFactory {
         ExcelReaderContext<R> readerContext = new ExcelReaderContext<>(excelClass);
         readerContext.setIdCard("".equals(excel.idCard()) ? excelClass.getName() : excel.idCard());
         readerContext.setFieldProperties(BeanUtils.getExcelFiledProperties(excelClass, null));
-        return new ExcelClassReader<>(readerContext, inputStream, excelType, excel.cacheRow(), excel.bufferSize());
+        return new ExcelClassReader<>(readerContext, inputStream, excelType, excel);
     }
 }

@@ -73,7 +73,7 @@ public class ExcelClassReadExecutor<R> extends ExcelBaseReadExecutor<R> {
                 r = this.context.getExcelEntity().newInstance();
                 context.setVariable(super.context.getExcelEntity().getSimpleName(), r);
             } catch (InstantiationException | IllegalAccessException e) {
-                throw new ExcelException("Excel entity init failure, " + e.getMessage());
+                throw new ExcelException("Class object instantiation failed, " + e.getMessage());
             }
             for (int fieldIndex = 0, size = super.context.getFieldProperties().size(); fieldIndex < size; fieldIndex++) {
                 ExcelFieldProperty property = this.context.getFieldProperties().get(fieldIndex);

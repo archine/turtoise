@@ -3,13 +3,12 @@ package cn.gjing.excel.executor.write;
 import cn.gjing.excel.base.aware.ExcelWorkbookAware;
 import cn.gjing.excel.base.aware.ExcelWriteContextAware;
 import cn.gjing.excel.base.context.ExcelWriterContext;
-import cn.gjing.excel.base.exception.ExcelException;
 import cn.gjing.excel.base.listener.write.ExcelWriteListener;
 import cn.gjing.excel.base.meta.ExcelInitializerMeta;
 import cn.gjing.excel.base.meta.ExcelType;
 import cn.gjing.excel.base.meta.ExecMode;
-import cn.gjing.excel.executor.util.ListenerChain;
 import cn.gjing.excel.base.util.ParamUtils;
+import cn.gjing.excel.executor.util.ListenerChain;
 import cn.gjing.excel.executor.write.core.ExcelBaseWriteExecutor;
 import cn.gjing.excel.executor.write.core.ExcelClassWriterExecutor;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -18,7 +17,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.UUID;
 
 /**
@@ -69,20 +67,13 @@ public abstract class ExcelBaseWriter {
      * Flush all content to excel of the cache
      */
     public void flush() {
-        this.processBind();
-        if (ListenerChain.doWorkbookFlushBefore(this.context.getListenerCache(), this.context.getWorkbook())) {
-            this.writeExecutor.flush(this.response, this.context);
-            if (this.context.getWorkbook() instanceof SXSSFWorkbook) {
-                ((SXSSFWorkbook) this.context.getWorkbook()).dispose();
-            }
-            return;
-        }
         try {
-            if (this.context.getWorkbook() != null) {
-                this.context.getWorkbook().close();
+            if (ListenerChain.doWorkbookFlushBefore(this.context.getListenerCache(), this.context.getWorkbook())) {
+                this.processBind();
+                this.writeExecutor.flush(this.response, this.context);
             }
-        } catch (IOException e) {
-            throw new ExcelException(e.getMessage());
+        } finally {
+            this.close();
         }
     }
 
@@ -92,20 +83,13 @@ public abstract class ExcelBaseWriter {
      * @param path Absolute path to the directory where the file is stored
      */
     public void flushToLocal(String path) {
-        this.processBind();
-        if (ListenerChain.doWorkbookFlushBefore(this.context.getListenerCache(), this.context.getWorkbook())) {
-            this.writeExecutor.flushToLocal(path, this.context);
-            if (this.context.getWorkbook() instanceof SXSSFWorkbook) {
-                ((SXSSFWorkbook) this.context.getWorkbook()).dispose();
-            }
-            return;
-        }
         try {
-            if (this.context.getWorkbook() != null) {
-                this.context.getWorkbook().close();
+            if (ListenerChain.doWorkbookFlushBefore(this.context.getListenerCache(), this.context.getWorkbook())) {
+                this.processBind();
+                this.writeExecutor.flushToLocal(path, this.context);
             }
-        } catch (IOException e) {
-            throw new ExcelException(e.getMessage());
+        } finally {
+            this.close();
         }
     }
 
@@ -125,6 +109,23 @@ public abstract class ExcelBaseWriter {
         ListenerChain.doCompleteSheet(this.context.getListenerCache(), sheet);
     }
 
+    /**
+     * Close workbook resource
+     */
+    public void close() {
+        if (this.context.getWorkbook() != null) {
+            try {
+                if (this.context.getWorkbook() instanceof SXSSFWorkbook) {
+                    ((SXSSFWorkbook) this.context.getWorkbook()).dispose();
+                } else {
+                    this.context.getWorkbook().close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     protected void initAware(ExcelWriteListener excelWriteListener) {
         if (excelWriteListener instanceof ExcelWriteContextAware) {
             ((ExcelWriteContextAware) excelWriteListener).setContext(this.context);
@@ -140,7 +141,7 @@ public abstract class ExcelBaseWriter {
         }
         String unqSheetName = "excelUnqSheet";
         Sheet sheet = this.context.getWorkbook().createSheet(unqSheetName);
-        sheet.protectSheet(UUID.randomUUID().toString().replaceAll("-", ""));
+        sheet.protectSheet(UUID.randomUUID().toString());
         Row row = sheet.createRow(0);
         row.createCell(0).setCellValue(ParamUtils.encodeMd5(this.context.getIdCard()));
         this.context.getWorkbook().setSheetHidden(this.context.getWorkbook().getSheetIndex(sheet), true);

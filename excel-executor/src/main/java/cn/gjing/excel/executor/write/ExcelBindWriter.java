@@ -14,7 +14,6 @@ import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
@@ -70,12 +69,17 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
      * @return this
      */
     public ExcelBindWriter write(List<?> data, String sheetName, boolean needHead) {
-        super.createSheet(sheetName);
-        if (needHead) {
-            super.writeExecutor.writeHead();
-        }
-        if (data != null && !data.isEmpty()) {
-            super.writeExecutor.writeBody(data);
+        try {
+            super.createSheet(sheetName);
+            if (needHead) {
+                super.writeExecutor.writeHead();
+            }
+            if (data != null && !data.isEmpty()) {
+                super.writeExecutor.writeBody(data);
+            }
+        } catch (Exception e) {
+            super.close();
+            throw e;
         }
         return this;
     }
@@ -99,8 +103,13 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
      */
     public ExcelBindWriter writeTitle(BigTitle bigTitle, String sheetName) {
         if (bigTitle != null) {
-            super.createSheet(sheetName);
-            super.writeExecutor.writeTitle(bigTitle);
+            try {
+                super.createSheet(sheetName);
+                super.writeExecutor.writeTitle(bigTitle);
+            } catch (Exception e) {
+                super.close();
+                throw e;
+            }
         }
         return this;
     }
@@ -114,7 +123,10 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
      */
     public ExcelBindWriter resetEntity(Class<?> excelEntity, String... ignores) {
         Excel excel = excelEntity.getAnnotation(Excel.class);
-        Objects.requireNonNull(excel, "Failed to reset Excel class, the @Excel annotation was not found on the " + excelEntity);
+        if (excel == null) {
+            super.close();
+            throw new ExcelException("Failed to reset Excel class, the @Excel annotation was not found on the " + excelEntity);
+        }
         super.context.setFieldProperties(BeanUtils.getExcelFiledProperties(excelEntity, ignores));
         super.context.setExcelEntity(excelEntity);
         super.context.setBodyHeight(excel.bodyHeight());
@@ -156,6 +168,7 @@ public final class ExcelBindWriter extends ExcelBaseWriter {
      */
     public ExcelBindWriter bind(String idCard) {
         if (!StringUtils.hasText(idCard)) {
+            super.close();
             throw new ExcelException("id card cannot be empty");
         }
         super.context.setIdCard(idCard);

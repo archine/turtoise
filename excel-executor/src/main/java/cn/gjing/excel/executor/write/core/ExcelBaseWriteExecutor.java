@@ -91,7 +91,7 @@ public abstract class ExcelBaseWriteExecutor {
             }
             ListenerChain.doCompleteRow(this.context.getListenerCache(), this.context.getSheet(), headRow, null, level, RowType.HEAD);
         }
-    };
+    }
 
     /**
      * Write excel body
@@ -130,9 +130,6 @@ public abstract class ExcelBaseWriteExecutor {
                     outputStream.flush();
                     outputStream.close();
                 }
-                if (context.getWorkbook() != null) {
-                    context.getWorkbook().close();
-                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -157,9 +154,6 @@ public abstract class ExcelBaseWriteExecutor {
                 if (fileOutputStream != null) {
                     fileOutputStream.flush();
                     fileOutputStream.close();
-                }
-                if (context.getWorkbook() != null) {
-                    context.getWorkbook().close();
                 }
             } catch (IOException e) {
                 e.printStackTrace();

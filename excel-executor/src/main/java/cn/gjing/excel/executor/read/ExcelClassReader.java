@@ -1,5 +1,6 @@
 package cn.gjing.excel.executor.read;
 
+import cn.gjing.excel.base.annotation.Excel;
 import cn.gjing.excel.base.context.ExcelReaderContext;
 import cn.gjing.excel.base.exception.ExcelException;
 import cn.gjing.excel.base.exception.ExcelTemplateException;
@@ -19,8 +20,8 @@ import java.util.List;
  * @author Gjing
  **/
 public final class ExcelClassReader<R> extends ExcelBaseReader<R> {
-    public ExcelClassReader(ExcelReaderContext<R> context, InputStream inputStream, ExcelType excelType, int cacheRowSize, int bufferSize) {
-        super(context, inputStream, excelType, cacheRowSize, bufferSize, ExecMode.R_CLASS);
+    public ExcelClassReader(ExcelReaderContext<R> context, InputStream inputStream, ExcelType excelType, Excel excel) {
+        super(context, inputStream, excelType, excel, ExecMode.R_CLASS);
     }
 
     /**
@@ -30,8 +31,7 @@ public final class ExcelClassReader<R> extends ExcelBaseReader<R> {
      * @return this
      */
     public ExcelClassReader<R> read() {
-        super.baseReadExecutor.read(0, this.defaultSheetName);
-        return this;
+        return this.read(0, this.defaultSheetName);
     }
 
     /**
@@ -42,8 +42,7 @@ public final class ExcelClassReader<R> extends ExcelBaseReader<R> {
      * @return this
      */
     public ExcelClassReader<R> read(String sheetName) {
-        super.baseReadExecutor.read(0, sheetName);
-        return this;
+        return this.read(0, sheetName);
     }
 
     /**
@@ -55,8 +54,7 @@ public final class ExcelClassReader<R> extends ExcelBaseReader<R> {
      * @return this
      */
     public ExcelClassReader<R> read(int headerIndex) {
-        super.baseReadExecutor.read(headerIndex, this.defaultSheetName);
-        return this;
+        return this.read(headerIndex, this.defaultSheetName);
     }
 
     /**
@@ -68,7 +66,12 @@ public final class ExcelClassReader<R> extends ExcelBaseReader<R> {
      * @return this
      */
     public ExcelClassReader<R> read(int headerIndex, String sheetName) {
-        super.baseReadExecutor.read(headerIndex, sheetName);
+        try {
+            super.baseReadExecutor.read(headerIndex, sheetName);
+        } catch (Exception e) {
+            super.finish();
+            throw e;
+        }
         return this;
     }
 
@@ -103,6 +106,7 @@ public final class ExcelClassReader<R> extends ExcelBaseReader<R> {
      **/
     public ExcelClassReader<R> check(String idCard) {
         if (!StringUtils.hasText(idCard)) {
+            super.finish();
             throw new ExcelException("idCard cannot be empty");
         }
         super.context.setCheckTemplate(true);

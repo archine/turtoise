@@ -7,6 +7,7 @@ import cn.gjing.excel.base.meta.RowType;
 import cn.gjing.excel.base.util.ExcelUtils;
 import cn.gjing.excel.base.util.ParamUtils;
 import cn.gjing.excel.executor.util.ListenerChain;
+import com.monitorjbl.xlsx.exceptions.MissingSheetException;
 import com.monitorjbl.xlsx.impl.StreamingWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -73,7 +74,7 @@ public abstract class ExcelBaseReadExecutor<R> {
         if (this.context.getWorkbook() instanceof StreamingWorkbook) {
             try {
                 this.context.setSheet(this.context.getWorkbook().getSheet(sheetName));
-            } catch (Exception e) {
+            } catch (MissingSheetException e) {
                 throw new ExcelException("The " + sheetName + " is not found in the workbook");
             }
         } else {

@@ -1,14 +1,15 @@
 package cn.gjing.excel.executor.read;
 
+import cn.gjing.excel.base.annotation.Excel;
 import cn.gjing.excel.base.aware.ExcelReaderContextAware;
 import cn.gjing.excel.base.aware.ExcelWorkbookAware;
 import cn.gjing.excel.base.context.ExcelReaderContext;
 import cn.gjing.excel.base.exception.ExcelException;
 import cn.gjing.excel.base.exception.ExcelTemplateException;
 import cn.gjing.excel.base.listener.read.ExcelReadListener;
+import cn.gjing.excel.base.meta.ExcelInitializerMeta;
 import cn.gjing.excel.base.meta.ExcelType;
 import cn.gjing.excel.base.meta.ExecMode;
-import cn.gjing.excel.base.meta.ExcelInitializerMeta;
 import cn.gjing.excel.executor.read.core.ExcelBaseReadExecutor;
 import cn.gjing.excel.executor.read.core.ExcelClassReadExecutor;
 import com.monitorjbl.xlsx.StreamingReader;
@@ -32,10 +33,10 @@ public abstract class ExcelBaseReader<R> {
     protected ExcelBaseReadExecutor<R> baseReadExecutor;
     protected final String defaultSheetName = "Sheet1";
 
-    public ExcelBaseReader(ExcelReaderContext<R> context, InputStream inputStream, ExcelType excelType, int cacheRowSize, int bufferSize, ExecMode execMode) {
+    public ExcelBaseReader(ExcelReaderContext<R> context, InputStream inputStream, ExcelType excelType, Excel excel, ExecMode execMode) {
         this.context = context;
         this.inputStream = inputStream;
-        this.chooseResolver(excelType, cacheRowSize, bufferSize, execMode);
+        this.chooseResolver(excelType, excel);
         ExcelInitializerMeta.INSTANT.initListener(context.getExcelEntity(), execMode, context.getListenerCache());
     }
 
@@ -55,13 +56,13 @@ public abstract class ExcelBaseReader<R> {
         }
     }
 
-    private void chooseResolver(ExcelType excelType, int cacheRowSize, int bufferSize, ExecMode execMode) {
+    private void chooseResolver(ExcelType excelType, Excel excel) {
         switch (excelType) {
             case XLS:
                 try {
                     this.context.setWorkbook(new HSSFWorkbook(this.inputStream));
-                } catch (NotOLE2FileException | OfficeXmlFileException exception) {
-                    exception.printStackTrace();
+                } catch (NotOLE2FileException | OfficeXmlFileException e) {
+                    e.printStackTrace();
                     throw new ExcelTemplateException();
                 } catch (IOException e) {
                     throw new ExcelException("Init workbook error, " + e.getMessage());
@@ -70,8 +71,12 @@ public abstract class ExcelBaseReader<R> {
             case XLSX:
                 Workbook workbook;
                 try {
-                    workbook = StreamingReader.builder().rowCacheSize(cacheRowSize).bufferSize(bufferSize).open(this.inputStream);
+                    workbook = StreamingReader.builder()
+                            .rowCacheSize(excel.cacheRow())
+                            .bufferSize(excel.bufferSize())
+                            .open(this.inputStream);
                 } catch (NotOfficeXmlFileException e) {
+                    this.finish();
                     e.printStackTrace();
                     throw new ExcelTemplateException();
                 }
