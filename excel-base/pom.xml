@@ -5,11 +5,11 @@
     <parent>
         <artifactId>turtoise</artifactId>
         <groupId>cn.gjing</groupId>
-        <version>2022.2.5</version>
+        <version>2022.2.7</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>excel-base</artifactId>
-    <version>2022.2.0</version>
+    <version>2023.4.0</version>
     <description>Excel基础包,包含注解、监听器等</description>
 
     <properties>
@@ -20,44 +20,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi</artifactId>
-            <version>4.1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
-            <version>4.1.2</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-compress</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-compress</artifactId>
-            <version>1.21</version>
-        </dependency>
-        <dependency>
-            <groupId>com.monitorjbl</groupId>
-            <artifactId>xlsx-streamer</artifactId>
-            <version>2.2.0</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>poi</artifactId>
-                    <groupId>org.apache.poi</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>poi-ooxml</artifactId>
-                    <groupId>org.apache.poi</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>poi-ooxml-schemas</artifactId>
-                    <groupId>org.apache.poi</groupId>
-                </exclusion>
-            </exclusions>
+            <groupId>com.github.pjfanning</groupId>
+            <artifactId>excel-streaming-reader</artifactId>
+            <version>4.0.5</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>

@@ -75,4 +75,19 @@ public @interface Excel {
      * @return key
      */
     String idCard() default "";
+
+    /**
+     * whether to read shapes (associated with pictures that appear in sheets)
+     * Only for xlsx
+     *
+     * @return default false
+     */
+    boolean shape() default false;
+
+    /**
+     * Enables the reading of hyperlink data associated with sheets
+     *
+     * @return hyperlink
+     */
+    boolean hyperlink() default false;
 }

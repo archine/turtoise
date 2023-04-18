@@ -12,7 +12,7 @@ import cn.gjing.excel.base.meta.ExcelType;
 import cn.gjing.excel.base.meta.ExecMode;
 import cn.gjing.excel.executor.read.core.ExcelBaseReadExecutor;
 import cn.gjing.excel.executor.read.core.ExcelClassReadExecutor;
-import com.monitorjbl.xlsx.StreamingReader;
+import com.github.pjfanning.xlsx.StreamingReader;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException;
 import org.apache.poi.poifs.filesystem.NotOLE2FileException;
@@ -74,6 +74,8 @@ public abstract class ExcelBaseReader<R> {
                     workbook = StreamingReader.builder()
                             .rowCacheSize(excel.cacheRow())
                             .bufferSize(excel.bufferSize())
+                            .setReadShapes(excel.shape())
+                            .setReadHyperlinks(excel.hyperlink())
                             .open(this.inputStream);
                 } catch (NotOfficeXmlFileException e) {
                     this.finish();
