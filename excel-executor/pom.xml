@@ -5,11 +5,11 @@
     <parent>
         <artifactId>turtoise</artifactId>
         <groupId>cn.gjing</groupId>
-        <version>2022.2.7</version>
+        <version>2022.2.8</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>excel-executor</artifactId>
-    <version>2023.4.0</version>
+    <version>2023.4.1</version>
     <description>Excel executor provides core functions of Excel import and export</description>
 
     <properties>
@@ -33,7 +33,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
-            <version>5.3.22</version>
+            <version>5.3.23</version>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -41,6 +41,11 @@
             <artifactId>spring-context</artifactId>
             <version>5.3.22</version>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.11.0</version>
         </dependency>
     </dependencies>
 
