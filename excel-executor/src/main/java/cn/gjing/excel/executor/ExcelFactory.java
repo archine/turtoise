@@ -15,10 +15,13 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.net.URLEncoder;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
@@ -161,7 +164,7 @@ public final class ExcelFactory {
      * Create an Excel class reader
      *
      * @param inputStream Excel file inputStream
-     * @param excelClass Object class to be generated
+     * @param excelClass  Object class to be generated
      * @param excelType   Excel file type
      * @param <R>         Entity type
      * @return ExcelReader
@@ -174,5 +177,27 @@ public final class ExcelFactory {
         readerContext.setIdCard("".equals(excel.idCard()) ? excelClass.getName() : excel.idCard());
         readerContext.setFieldProperties(BeanUtils.getExcelFiledProperties(excelClass, null));
         return new ExcelClassReader<>(readerContext, inputStream, excelType, excel);
+    }
+
+    /**
+     * Output the small file to the network for download
+     * Note: Not suitable for transferring large files (GB level)
+     *
+     * @param file     File
+     * @param filename Downloaded file name
+     * @param response HttpServletResponse
+     */
+    public static void transferToNetwork(File file, String filename, HttpServletResponse response) throws IOException {
+        response.setHeader("Content-Type", Files.probeContentType(Paths.get(file.getAbsolutePath())));
+        response.setContentLength((int) file.length());
+        String encodeFileName = URLEncoder.encode(filename, "utf-8").replaceAll("\\+", "%20");
+        String dispositionVal = "attachment; filename=" + encodeFileName + ";" + "filename*=" + "utf-8''" + encodeFileName;
+        response.setHeader("Content-disposition", dispositionVal);
+        try (FileInputStream fileInputStream = new FileInputStream(file);
+             FileChannel fileChannel = fileInputStream.getChannel();
+             OutputStream outputStream = response.getOutputStream();
+             WritableByteChannel writableByteChannel = Channels.newChannel(outputStream)) {
+            fileChannel.transferTo(0, fileChannel.size(), writableByteChannel);
+        }
     }
 }
