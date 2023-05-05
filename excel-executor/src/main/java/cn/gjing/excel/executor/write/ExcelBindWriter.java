@@ -10,9 +10,9 @@ import cn.gjing.excel.base.meta.ExecMode;
 import cn.gjing.excel.base.meta.WRMode;
 import cn.gjing.excel.executor.read.ExcelClassReader;
 import cn.gjing.excel.executor.util.BeanUtils;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.util.StringUtils;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.function.Predicate;
 

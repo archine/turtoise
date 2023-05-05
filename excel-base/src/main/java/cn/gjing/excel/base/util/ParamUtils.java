@@ -17,7 +17,7 @@ public final class ParamUtils {
      * @return boolean
      */
     public static boolean contains(String[] arr, String val) {
-        if (arr == null || arr.length == 0) {
+        if (arr == null) {
             return false;
         }
         for (String o : arr) {
@@ -78,7 +78,7 @@ public final class ParamUtils {
     public static String numberToEn(int number) {
         char prefix = 'A';
         if (number < 26) {
-            return "" + (char) ('A' + number);
+            return String.valueOf((char) ('A' + number));
         }
         char suffix;
         if ((number - 25) % 26 == 0) {
@@ -88,6 +88,6 @@ public final class ParamUtils {
             suffix = (char) ('A' + (number - 25) % 26 - 1);
             prefix = (char) (prefix + (number - 25) / 26);
         }
-        return "" + prefix + suffix;
+        return String.valueOf(prefix) + suffix;
     }
 }

@@ -5,15 +5,15 @@
     <parent>
         <artifactId>turtoise</artifactId>
         <groupId>cn.gjing</groupId>
-        <version>2022.2.3</version>
+        <version>2023.5.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>excel-style</artifactId>
-    <version>2022.1.4</version>
+    <version>2023.5.0</version>
     <description>Excel样式</description>
 
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
@@ -22,7 +22,7 @@
         <dependency>
             <groupId>cn.gjing</groupId>
             <artifactId>excel-base</artifactId>
-            <version>2022.1.7</version>
+            <version>2023.5.0</version>
             <optional>true</optional>
         </dependency>
     </dependencies>
@@ -34,8 +34,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <source>8</source>
-                    <target>8</target>
+                    <source>17</source>
+                    <target>17</target>
                 </configuration>
             </plugin>
         </plugins>

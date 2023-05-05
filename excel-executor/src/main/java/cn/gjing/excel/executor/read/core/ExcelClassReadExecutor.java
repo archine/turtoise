@@ -19,6 +19,7 @@ import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -70,10 +71,12 @@ public class ExcelClassReadExecutor<R> extends ExcelBaseReadExecutor<R> {
             }
             super.saveCurrentRowObj = true;
             try {
-                r = this.context.getExcelEntity().newInstance();
+                r = this.context.getExcelEntity().getDeclaredConstructor().newInstance();
                 context.setVariable(super.context.getExcelEntity().getSimpleName(), r);
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new ExcelException("Class object instantiation failed, " + e.getMessage());
+            } catch (InvocationTargetException | NoSuchMethodException e) {
+                throw new RuntimeException(e);
             }
             for (int fieldIndex = 0, size = super.context.getFieldProperties().size(); fieldIndex < size; fieldIndex++) {
                 ExcelFieldProperty property = this.context.getFieldProperties().get(fieldIndex);

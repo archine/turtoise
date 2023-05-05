@@ -58,7 +58,7 @@ public abstract class ExcelBaseReader<R> {
 
     private void chooseResolver(ExcelType excelType, Excel excel) {
         switch (excelType) {
-            case XLS:
+            case XLS -> {
                 try {
                     this.context.setWorkbook(new HSSFWorkbook(this.inputStream));
                 } catch (NotOLE2FileException | OfficeXmlFileException e) {
@@ -67,8 +67,8 @@ public abstract class ExcelBaseReader<R> {
                 } catch (IOException e) {
                     throw new ExcelException("Init workbook error, " + e.getMessage());
                 }
-                break;
-            case XLSX:
+            }
+            case XLSX -> {
                 Workbook workbook;
                 try {
                     workbook = StreamingReader.builder()
@@ -83,9 +83,8 @@ public abstract class ExcelBaseReader<R> {
                     throw new ExcelTemplateException();
                 }
                 this.context.setWorkbook(workbook);
-                break;
-            default:
-                throw new ExcelException("Excel type invalid");
+            }
+            default -> throw new ExcelException("Excel type invalid");
         }
         this.baseReadExecutor = new ExcelClassReadExecutor<>(this.context);
     }

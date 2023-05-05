@@ -11,12 +11,12 @@ import cn.gjing.excel.base.util.ParamUtils;
 import cn.gjing.excel.executor.util.ListenerChain;
 import cn.gjing.excel.executor.write.core.ExcelBaseWriteExecutor;
 import cn.gjing.excel.executor.write.core.ExcelClassWriterExecutor;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.UUID;
 
 /**
@@ -52,13 +52,10 @@ public abstract class ExcelBaseWriter {
      */
     protected void chooseResolver(ExcelWriterContext context, int windowSize, ExecMode mode) {
         switch (this.context.getExcelType()) {
-            case XLS:
-                context.setWorkbook(new HSSFWorkbook());
-                break;
-            case XLSX:
-                context.setWorkbook(new SXSSFWorkbook(windowSize));
-                break;
-            default:
+            case XLS -> context.setWorkbook(new HSSFWorkbook());
+            case XLSX -> context.setWorkbook(new SXSSFWorkbook(windowSize));
+            default -> {
+            }
         }
         this.writeExecutor = new ExcelClassWriterExecutor(context);
     }

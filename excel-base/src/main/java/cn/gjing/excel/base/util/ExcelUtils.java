@@ -97,7 +97,7 @@ public final class ExcelUtils {
         if (fileName == null) {
             return null;
         }
-        int pos = fileName.lastIndexOf(".") + 1;
+        var pos = fileName.lastIndexOf(".") + 1;
         String extension = fileName.substring(pos);
         if ("xls".equals(extension)) {
             return ExcelType.XLS;

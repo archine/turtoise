@@ -11,15 +11,16 @@ import cn.gjing.excel.executor.read.ExcelClassReader;
 import cn.gjing.excel.executor.util.BeanUtils;
 import cn.gjing.excel.executor.write.ExcelBindWriter;
 import cn.gjing.excel.executor.write.ExcelSimpleWriter;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -190,7 +191,7 @@ public final class ExcelFactory {
     public static void transferToNetwork(File file, String filename, HttpServletResponse response) throws IOException {
         response.setHeader("Content-Type", Files.probeContentType(Paths.get(file.getAbsolutePath())));
         response.setContentLength((int) file.length());
-        String encodeFileName = URLEncoder.encode(filename, "utf-8").replaceAll("\\+", "%20");
+        String encodeFileName = URLEncoder.encode(filename, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         String dispositionVal = "attachment; filename=" + encodeFileName + ";" + "filename*=" + "utf-8''" + encodeFileName;
         response.setHeader("Content-disposition", dispositionVal);
         try (FileInputStream fileInputStream = new FileInputStream(file);

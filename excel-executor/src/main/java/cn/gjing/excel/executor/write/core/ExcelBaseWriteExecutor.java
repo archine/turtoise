@@ -9,15 +9,16 @@ import cn.gjing.excel.base.meta.RowType;
 import cn.gjing.excel.base.meta.WRMode;
 import cn.gjing.excel.base.util.ExcelUtils;
 import cn.gjing.excel.executor.util.ListenerChain;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -112,7 +113,7 @@ public abstract class ExcelBaseWriteExecutor {
         String fileName = context.getFileName() + (context.getExcelType() == ExcelType.XLS ? ".xls" : ".xlsx");
         OutputStream outputStream = null;
         try {
-            String encodeFileName = URLEncoder.encode(fileName, "utf-8").replaceAll("\\+", "%20");
+            String encodeFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
             String dispositionVal = "attachment; filename=" +
                     encodeFileName +
                     ";" +
