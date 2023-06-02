@@ -7,7 +7,7 @@
     <groupId>cn.gjing</groupId>
     <artifactId>turtoise</artifactId>
     <packaging>pom</packaging>
-    <version>2023.5.0</version>
+    <version>2023.5.1-boot3</version>
 
     <properties>
         <java.version>17</java.version>
